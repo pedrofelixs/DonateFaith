@@ -21,7 +21,7 @@ const AboutUs = () => {
                         </p>
                     </div>
                     <div className="flex justify-center">
-                        <img src="/Images/About/team-church.jpg" alt="Equipe do projeto" className="rounded-2xl shadow-lg w-full max-w-md" />
+                        <img src="https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg" alt="Equipe do projeto" className="rounded-2xl shadow-lg w-full max-w-md" />
                     </div>
                 </div>
             </div>

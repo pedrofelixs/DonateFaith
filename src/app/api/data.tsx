@@ -4,23 +4,23 @@ export const FeaturesData: {
     subheading: string;
 }[] = [
     {
-        imgSrc: '/Images/Cards/donate.svg',
-        heading: 'Doacoes',
+        imgSrc: 'https://www.svgrepo.com/show/334622/donate-heart.svg',
+        heading: 'Doações',
         subheading: 'Arrecade doações para sua igreja'
     },
     {
-        imgSrc: '',
+        imgSrc: 'https://www.svgrepo.com/show/533401/calendar-week.svg',
         heading: 'Eventos',
         subheading: 'Organize eventos na sua instituição'
     },
     {
-        imgSrc: '',
-        heading: 'Dizimo',
+        imgSrc: 'https://www.svgrepo.com/show/308128/tithing-church-tithing-church-donation-tithe.svg',
+        heading: 'Dízimo',
         subheading: 'Receba o dízimo de membros'
     },
     {
-        imgSrc: '',
+        imgSrc: 'https://www.svgrepo.com/show/416021/manage-dashboard-analytic.svg',
         heading: 'Gerencie',
         subheading: 'Gerencie sua igreja da melhor forma'
     },
-    ]
+];

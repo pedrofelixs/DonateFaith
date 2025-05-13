@@ -9,7 +9,7 @@ const Footer: FC = () => {
         <footer className="pt-16 bg-darkmode">
             <div className="container mx-auto lg:max-w-screen-xl md:max-w-screen-md px-4">
                 <div className="grid grid-cols-1 sm:grid-cols-5 lg:gap-20 md:gap-6 sm:gap-12 gap-6  pb-16">
-                    <div className="col-span-2">
+                    <div className="col-span-3">
                         <Logo />
                         <p className="text-xs font-medium text-grey dark:text-white/50 mt-5 mb-16 max-w-70%">
                         
@@ -42,14 +42,14 @@ const Footer: FC = () => {
                         </div>
                     </div>
                     <div className="">
-                        <h4 className="text-black dark:text-white mb-9 font-semibold text-xl">Igreja</h4>
+                        <h4 className="text-black dark:text-white mb-9 font-semibold text-xl">Info</h4>
                         <ul>
                             <li className="pb-5">
                                 <Link
                                     href="#"
                                     className="text-black/70 dark:text-white/70 hover:text-primary dark:hover:text-primary text-base"
                                 >
-                                    Sobre.
+                                    Sobre
                                 </Link>
                             </li>
                             <li className="pb-5">
@@ -57,56 +57,14 @@ const Footer: FC = () => {
                                     href="#"
                                     className="text-black/70 dark:text-white/70 hover:text-primary dark:hover:text-primary text-base"
                                 >
-                                    Contato.
+                                    Contato
                                 </Link>
                             </li>
-                            <li className="pb-5">
-                                <Link
-                                    href="#"
-                                    className="text-black/70 dark:text-white/70 hover:text-primary dark:hover:text-primary text-base"
-                                >
-                                    Ver Mapa.
-                                </Link>
-                            </li>
+                            
+                    
                         </ul>
                     </div>
-                    <div className="">
-                        <h4 className="text-black dark:text-white mb-9 font-semibold text-xl">Programacao</h4>
-                        <ul>
-                            <li className="pb-5">
-                                <Link
-                                    href="#"
-                                    className="text-black/70 dark:text-white/70 dark:hover:text-primary hover:text-primary text-base"
-                                >
-                                    Cultos.
-                                </Link>
-                            </li>
-                            <li className="pb-5">
-                                <Link
-                                    href="#"
-                                    className="text-black/70 dark:text-white/70 dark:hover:text-primary hover:text-primary text-base"
-                                >
-                                    Células.
-                                </Link>
-                            </li>
-                            <li className="pb-5">
-                                <Link
-                                    href="#"
-                                    className="text-black/70 dark:text-white/70 hover:text-primary dark:hover:text-primary text-base"
-                                >
-                                    Missões.
-                                </Link>
-                            </li>
-                            <li className="pb-5">
-                                <Link
-                                    href="#"
-                                    className="text-black/70 dark:text-white/70 hover:text-primary dark:hover:text-primary text-base"
-                                >
-                                    Agendamentos.
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
+                    
                     <div className="">
                         <h4 className="text-black dark:text-white mb-9 font-semibold text-xl">Mais</h4>
                         <ul>

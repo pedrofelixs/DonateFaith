@@ -177,15 +177,15 @@ __turbopack_context__.s({
 const headerData = [
     {
         label: "Home",
-        href: "#home-section"
+        href: "/#home-section"
     },
     {
-        label: "Doacoes",
-        href: "#donate-section"
+        label: "Doações",
+        href: "/#donate-section"
     },
     {
-        label: "Sobre Nos",
-        href: "#about-section"
+        label: "Sobre Nós",
+        href: "/#about-section"
     },
     {
         label: "Entrar",

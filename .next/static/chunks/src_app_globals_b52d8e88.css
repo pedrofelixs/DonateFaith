@@ -343,6 +343,10 @@
     grid-column: span 2 / span 2;
   }
 
+  .col-span-3 {
+    grid-column: span 3 / span 3;
+  }
+
   .col-span-12 {
     grid-column: span 12 / span 12;
   }
@@ -527,6 +531,10 @@
     height: calc(var(--spacing) * 8);
   }
 
+  .h-20 {
+    height: calc(var(--spacing) * 20);
+  }
+
   .h-\[22px\] {
     height: 22px;
   }
@@ -553,6 +561,10 @@
 
   .w-10 {
     width: calc(var(--spacing) * 10);
+  }
+
+  .w-20 {
+    width: calc(var(--spacing) * 20);
   }
 
   .w-\[22px\] {
@@ -753,6 +765,10 @@
 
   .fill-current {
     fill: currentColor;
+  }
+
+  .object-contain {
+    object-fit: contain;
   }
 
   .p-2 {

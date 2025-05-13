@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const Cards = ()=> {
     return(
-        <section className="bg-gray-700" id='sobre-section'>
+        <section className="bg-gray-700" id='donate-section'>
             <div className='container mx-auto lg:max-w-screen-xl md:max-w-screen-md pb-5'>
                 <div className='text-center mb-14 py-10'>
                     <p className='dark:text-sky-200 font-normal mb-9 tracking-[0.8rem] uppercase'>Funcionalidades</p>
@@ -15,6 +15,13 @@ const Cards = ()=> {
                 <div className='grid sm:grid-cols-2 lg:grid-cols-4 gap-y-15 gap-x-5 mt-15'>
                     {FeaturesData.map((items, i) =>(
                         <div className='p-8 relative rounded-3xl bg-gradient-to-b from-black/5 to-gray-400 dark:from-gray-600 dark:to-gray-800' key={i}>
+                            <div className='flex justify-center'>
+                                <img
+                                    src={items.imgSrc}
+                                    alt={items.heading}
+                                    className='w-20 h-20 object-contain'
+                                />
+                            </div>
                             <h3 className='text-2xl text-black dark:text-white font-semibold text-center mt-16'>{items.heading}</h3>
                             <p className='text-lg font-normal text-black/50 dark:text-white/50 text-center mt-2'>{items.subheading}</p>
                             <div className='flex items-center justify-center'>
