@@ -5,14 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using DonateFaith.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using DonateFaith.Domain.Infra.Data;
+using DonateFaith.Api.Data.Mappings;
 
 
 namespace DonateFaith.Domain.Infra.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options)
         {
+            
         }
 
         public const string connString = "Server=localhost,1433;Database=DonateFaith;User ID=sa;Password=1q2w3e4r@#$;Trusted_Connection=False;TrustServerCertificate=True;";
@@ -36,7 +40,16 @@ namespace DonateFaith.Domain.Infra.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-           
+            // Aplica todos os mapeamentos
+            modelBuilder.ApplyConfiguration(new AdminChurchMap());
+            modelBuilder.ApplyConfiguration(new ChurchMap());
+            modelBuilder.ApplyConfiguration(new DonationMap());
+            modelBuilder.ApplyConfiguration(new EventMap());
+            modelBuilder.ApplyConfiguration(new FinancialReportMap());
+            modelBuilder.ApplyConfiguration(new PostMap());
+            modelBuilder.ApplyConfiguration(new UserMap());
+            modelBuilder.ApplyConfiguration(new TitheMap());
+            modelBuilder.ApplyConfiguration(new TransactionMap());
         }
 
     }
