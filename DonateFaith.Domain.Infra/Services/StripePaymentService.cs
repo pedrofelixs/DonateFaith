@@ -1,10 +1,10 @@
 using DonateFaith.Domain.DTOs;
 using DonateFaith.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
-using Stripe.Checkout;
 using Stripe;
+using Stripe.Checkout;
 
-namespace DonateFaith.Infrastructure.Services
+namespace DonateFaith.Domain.Infra.Services
 {
     public class StripePaymentService : IPaymentService
     {

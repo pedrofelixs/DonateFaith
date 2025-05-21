@@ -1,8 +1,8 @@
+using DonateFaith.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using DonateFaith.Domain.Models;
 
-namespace DonateFaith.Api.Data.Mappings
+namespace DonateFaith.Domain.Infra.Data.Mappings
 {
     public class DonationMap : IEntityTypeConfiguration<Donation>
     {
@@ -63,7 +63,7 @@ namespace DonateFaith.Api.Data.Mappings
             builder.HasOne(d => d.Transaction)
                    .WithMany()
                    .HasForeignKey(d => d.TransactionId)
-                   .OnDelete(DeleteBehavior.SetNull);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             // Relacionamento com User (assumindo que será via e-mail logado)
             builder.HasOne(d => d.User)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using DonateFaith.Domain.Models.Enums;
 
 namespace DonateFaith.Domain.Models
 {
@@ -21,7 +22,7 @@ namespace DonateFaith.Domain.Models
         public PaymentMethod PaymentMethod { get; set; }
         public DateTime DonationDate { get; set; }
         public int? TransactionId { get; set; }
-        public Transaction Transaction { get; set; }
+        public Transaction? Transaction { get; set; }
         public User User { get; set; }
         public DateTime CreatedAt { get; set; }
     }

@@ -6,9 +6,8 @@ namespace DonateFaith.Domain.Api.Controllers
 {
     [Route("api/events")]
     [ApiController]
-    public class EventController
+    public class EventController : ControllerBase
     {
-
         private readonly EventService _eventService;
 
         public EventController(EventService eventService)

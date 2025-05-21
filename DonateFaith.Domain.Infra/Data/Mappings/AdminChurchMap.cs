@@ -1,8 +1,8 @@
+using DonateFaith.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using DonateFaith.Domain.Models;
 
-namespace DonateFaith.Api.Data.Mappings
+namespace DonateFaith.Domain.Infra.Data.Mappings
 {
     public class AdminChurchMap : IEntityTypeConfiguration<AdminChurch>
     {

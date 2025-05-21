@@ -1,8 +1,8 @@
+using DonateFaith.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using DonateFaith.Domain.Models;
 
-namespace DonateFaith.Api.Data.Mappings
+namespace DonateFaith.Domain.Infra.Data.Mappings
 {
     public class TitheMap : IEntityTypeConfiguration<Tithe>
     {
@@ -37,7 +37,8 @@ namespace DonateFaith.Api.Data.Mappings
             builder.HasOne(t => t.Transaction)
                    .WithMany()
                    .HasForeignKey(t => t.TransactionId)
-                   .OnDelete(DeleteBehavior.SetNull);
+                   .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

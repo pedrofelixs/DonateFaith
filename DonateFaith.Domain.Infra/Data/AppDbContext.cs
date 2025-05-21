@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using DonateFaith.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using DonateFaith.Domain.Infra.Data;
-using DonateFaith.Api.Data.Mappings;
+using DonateFaith.Domain.Infra.Data.Mappings;
 
 
 namespace DonateFaith.Domain.Infra.Data

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DonateFaith.Domain.Enums;
+using DonateFaith.Domain.Models.Enums;
 
 namespace DonateFaith.Domain.DTOs
 {
