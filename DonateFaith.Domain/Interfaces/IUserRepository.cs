@@ -9,10 +9,12 @@ namespace DonateFaith.Domain.Interfaces
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetUsersAsync(int page, int pageSize);
-        Task<User> GetByIdAsync(Guid id);
+        Task<User?> GetByEmailAsync(string email);
+        Task<User?> GetByCPFAsync(string cpf);
+        Task<User> GetByIdAsync(int id);
+        Task<IEnumerable<User>> GetMembersAsync();
         Task AddAsync(User user);
         Task UpdateAsync(User user);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(int id);
     }
 }

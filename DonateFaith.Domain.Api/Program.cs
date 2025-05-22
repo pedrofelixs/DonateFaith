@@ -1,4 +1,5 @@
 using DonateFaith.Domain.Api;
+using DonateFaith.Domain.Api.Middlewares;
 using DonateFaith.Domain.Infra.Data;
 using DonateFaith.Domain.Infra.Repositories;
 using DonateFaith.Domain.Interfaces;
@@ -20,6 +21,7 @@ builder.Services.AddScoped<DonationService>();
 
 // Controllers
 builder.Services.AddControllers();
+
 
 // Swagger (documentação)
 builder.Services.AddEndpointsApiExplorer();
@@ -45,7 +47,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers(); // Necessário para que os controllers sejam mapeados
-
+app.UseMiddleware<ResponseMiddelware>();
 app.Run();
 
 if (app.Environment.IsDevelopment())
