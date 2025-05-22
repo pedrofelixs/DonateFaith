@@ -15,8 +15,8 @@ namespace DonateFaith.Domain.Models
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public UserRole Role { get; set; }
-        public int? ChurchId { get; set; }
-        public Church? Church { get; set; }
+        public int ChurchId { get; set; }
+        public Church Church { get; set; }
         public ICollection<AdminChurch> AdminChurches { get; set; }
         public ICollection<Tithe> Tithes { get; set; }
     }

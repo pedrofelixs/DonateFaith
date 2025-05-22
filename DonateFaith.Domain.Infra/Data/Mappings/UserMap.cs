@@ -35,11 +35,11 @@ namespace DonateFaith.Domain.Infra.Data.Mappings
             builder.Property(u => u.Role)
                    .IsRequired();
 
-            // Relacionamento opcional com Igreja (ChurchId pode ser nulo)
+
             builder.HasOne(u => u.Church)
-                   .WithMany(c => c.Users)
-                   .HasForeignKey(u => u.ChurchId)
-                   .OnDelete(DeleteBehavior.Restrict); // evita deleção em cascata
+                    .WithMany(c => c.Users)
+                    .HasForeignKey(u => u.ChurchId)
+                    .IsRequired();
 
             // Relacionamento com AdminChurch (N:N)
             builder.HasMany(u => u.AdminChurches)

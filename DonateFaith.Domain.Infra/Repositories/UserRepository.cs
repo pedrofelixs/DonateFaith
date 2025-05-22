@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DonateFaith.Domain.Infra.Data;
+using DonateFaith.Domain.Interfaces;
 using DonateFaith.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DonateFaith.Domain.Infra.Repositories
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly AppDbContext _context;
 

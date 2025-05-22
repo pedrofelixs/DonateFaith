@@ -17,7 +17,7 @@ namespace DonateFaith.Domain.Infra.Data.Mappings
             builder.HasOne(ac => ac.Admin)
                    .WithMany() // Se você tiver uma propriedade do tipo List<AdminChurch> no User, substitua por .WithMany(u => u.AdminChurches)
                    .HasForeignKey(ac => ac.AdminId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             // Relação com Church
             builder.HasOne(ac => ac.Church)
