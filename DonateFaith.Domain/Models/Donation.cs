@@ -21,9 +21,12 @@ namespace DonateFaith.Domain.Models
         public decimal Amount { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public DateTime DonationDate { get; set; }
-        public int? TransactionId { get; set; }
-        public Transaction? Transaction { get; set; }
+        public int TransactionId { get; set; }
+        public Transaction Transaction { get; set; }
+        public ICollection<Donation> Donations { get; set; }
+
         public User User { get; set; }
+        public int UserId { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

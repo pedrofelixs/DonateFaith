@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DonateFaith.Domain.Infra.Migrations
 {
     /// <inheritdoc />
-    public partial class AjusteRelacoes : Migration
+    public partial class AjustesNoModeloProduto : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,10 +60,12 @@ namespace DonateFaith.Domain.Infra.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    CPF = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<int>(type: "int", nullable: false),
-                    ChurchId = table.Column<int>(type: "int", nullable: false)
+                    ChurchId = table.Column<int>(type: "int", nullable: false),
+                    ChurchCode = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -97,7 +99,7 @@ namespace DonateFaith.Domain.Infra.Migrations
                         column: x => x.AdminId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -115,10 +117,10 @@ namespace DonateFaith.Domain.Infra.Migrations
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PaymentMethod = table.Column<int>(type: "int", nullable: false),
                     DonationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TransactionId = table.Column<int>(type: "int", nullable: true),
+                    TransactionId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
-                    TransactionId1 = table.Column<int>(type: "int", nullable: true)
+                    DonationId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -130,16 +132,16 @@ namespace DonateFaith.Domain.Infra.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Donations_Donations_DonationId",
+                        column: x => x.DonationId,
+                        principalTable: "Donations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Donations_Transactions_TransactionId",
                         column: x => x.TransactionId,
                         principalTable: "Transactions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Donations_Transactions_TransactionId1",
-                        column: x => x.TransactionId1,
-                        principalTable: "Transactions",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Donations_Users_UserId",
                         column: x => x.UserId,
@@ -248,13 +250,14 @@ namespace DonateFaith.Domain.Infra.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     MemberId = table.Column<int>(type: "int", nullable: false),
                     ChurchId = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TransactionId = table.Column<int>(type: "int", nullable: false),
                     TitheDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TransactionId = table.Column<int>(type: "int", nullable: true),
-                    TransactionId1 = table.Column<int>(type: "int", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    TitheId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -266,16 +269,16 @@ namespace DonateFaith.Domain.Infra.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Tithes_Tithes_TitheId",
+                        column: x => x.TitheId,
+                        principalTable: "Tithes",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Tithes_Transactions_TransactionId",
                         column: x => x.TransactionId,
                         principalTable: "Transactions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Tithes_Transactions_TransactionId1",
-                        column: x => x.TransactionId1,
-                        principalTable: "Transactions",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Tithes_Users_MemberId",
                         column: x => x.MemberId,
@@ -286,7 +289,8 @@ namespace DonateFaith.Domain.Infra.Migrations
                         name: "FK_Tithes_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -300,14 +304,14 @@ namespace DonateFaith.Domain.Infra.Migrations
                 column: "ChurchId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Donations_DonationId",
+                table: "Donations",
+                column: "DonationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Donations_TransactionId",
                 table: "Donations",
                 column: "TransactionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Donations_TransactionId1",
-                table: "Donations",
-                column: "TransactionId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Donations_UserId",
@@ -355,14 +359,14 @@ namespace DonateFaith.Domain.Infra.Migrations
                 column: "MemberId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tithes_TitheId",
+                table: "Tithes",
+                column: "TitheId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tithes_TransactionId",
                 table: "Tithes",
                 column: "TransactionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tithes_TransactionId1",
-                table: "Tithes",
-                column: "TransactionId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tithes_UserId",

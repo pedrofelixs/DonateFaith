@@ -1,14 +1,19 @@
-﻿using System;
+﻿using DonateFaith.Domain.DTOs;
+using DonateFaith.Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DonateFaith.Domain.DTOs;
 
 namespace DonateFaith.Domain.Interfaces
 {
     public interface IDonationRepository
     {
-        Task<(List<DonationDto> Donations, int TotalItems)> GetDonationsAsync(int page, int pageSize);
+        Task<IEnumerable<Donation>> GetDonationsAsync(int page, int pageSize);
+        Task<Donation> GetByIdAsync(int id);
+        Task AddAsync(Donation donation);
+        Task UpdateAsync(Donation donation);
+        Task DeleteAsync(int id);
     }
 }

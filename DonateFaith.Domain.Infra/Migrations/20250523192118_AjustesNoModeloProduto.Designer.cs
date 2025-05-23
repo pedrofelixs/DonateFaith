@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DonateFaith.Domain.Infra.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250522004020_AjusteRelacoes")]
-    partial class AjusteRelacoes
+    [Migration("20250523192118_AjustesNoModeloProduto")]
+    partial class AjustesNoModeloProduto
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -107,6 +107,9 @@ namespace DonateFaith.Domain.Infra.Migrations
                     b.Property<DateTime>("DonationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("DonationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("DonorEmail")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -128,10 +131,7 @@ namespace DonateFaith.Domain.Infra.Migrations
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TransactionId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TransactionId1")
+                    b.Property<int>("TransactionId")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
@@ -141,9 +141,9 @@ namespace DonateFaith.Domain.Infra.Migrations
 
                     b.HasIndex("ChurchId");
 
-                    b.HasIndex("TransactionId");
+                    b.HasIndex("DonationId");
 
-                    b.HasIndex("TransactionId1");
+                    b.HasIndex("TransactionId");
 
                     b.HasIndex("UserId");
 
@@ -296,19 +296,22 @@ namespace DonateFaith.Domain.Infra.Migrations
                     b.Property<int>("ChurchId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("MemberId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("TitheDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("TransactionId")
+                    b.Property<int?>("TitheId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TransactionId1")
+                    b.Property<int>("TransactionId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -317,9 +320,9 @@ namespace DonateFaith.Domain.Infra.Migrations
 
                     b.HasIndex("MemberId");
 
-                    b.HasIndex("TransactionId");
+                    b.HasIndex("TitheId");
 
-                    b.HasIndex("TransactionId1");
+                    b.HasIndex("TransactionId");
 
                     b.HasIndex("UserId");
 
@@ -365,6 +368,13 @@ namespace DonateFaith.Domain.Infra.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CPF")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ChurchCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ChurchId")
                         .HasColumnType("int");
@@ -425,14 +435,15 @@ namespace DonateFaith.Domain.Infra.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DonateFaith.Domain.Models.Transaction", "Transaction")
-                        .WithMany()
-                        .HasForeignKey("TransactionId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("DonateFaith.Domain.Models.Transaction", null)
+                    b.HasOne("DonateFaith.Domain.Models.Donation", null)
                         .WithMany("Donations")
-                        .HasForeignKey("TransactionId1");
+                        .HasForeignKey("DonationId");
+
+                    b.HasOne("DonateFaith.Domain.Models.Transaction", "Transaction")
+                        .WithMany("Donations")
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("DonateFaith.Domain.Models.User", "User")
                         .WithMany()
@@ -518,24 +529,29 @@ namespace DonateFaith.Domain.Infra.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("DonateFaith.Domain.Models.Tithe", null)
+                        .WithMany("Tithes")
+                        .HasForeignKey("TitheId");
+
                     b.HasOne("DonateFaith.Domain.Models.Transaction", "Transaction")
-                        .WithMany()
+                        .WithMany("Tithes")
                         .HasForeignKey("TransactionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.HasOne("DonateFaith.Domain.Models.Transaction", null)
+                    b.HasOne("DonateFaith.Domain.Models.User", "User")
                         .WithMany("Tithes")
-                        .HasForeignKey("TransactionId1");
-
-                    b.HasOne("DonateFaith.Domain.Models.User", null)
-                        .WithMany("Tithes")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Church");
 
                     b.Navigation("Member");
 
                     b.Navigation("Transaction");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DonateFaith.Domain.Models.Transaction", b =>
@@ -575,6 +591,16 @@ namespace DonateFaith.Domain.Infra.Migrations
                     b.Navigation("Transactions");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("DonateFaith.Domain.Models.Donation", b =>
+                {
+                    b.Navigation("Donations");
+                });
+
+            modelBuilder.Entity("DonateFaith.Domain.Models.Tithe", b =>
+                {
+                    b.Navigation("Tithes");
                 });
 
             modelBuilder.Entity("DonateFaith.Domain.Models.Transaction", b =>

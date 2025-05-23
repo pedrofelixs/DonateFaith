@@ -11,48 +11,53 @@ using System.Threading.Tasks;
 
 namespace DonateFaith.Domain.Infra.Repositories
 {
-    public class DonationRepository : IDonationRepository
+    public class TitheRepository : ITitheRepository
     {
         private readonly AppDbContext _context;
 
-        public DonationRepository(AppDbContext context)
+        public TitheRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<Donation>> GetDonationsAsync(int page, int pageSize)
+        public async Task<IEnumerable<Tithe>> GetAllAsync(int page, int pageSize)
         {
-            return await _context.Donations
+            return await _context.Tithes
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
         }
 
-        public async Task<Donation> GetByIdAsync(int id)
-        {
-            return await _context.Donations.FindAsync(id);
-        }
+        public async Task<Tithe> GetByIdAsync(int id) =>
+            await _context.Tithes.FindAsync(id);
 
-        public async Task AddAsync(Donation donation)
+        public async Task AddAsync(Tithe tithe)
         {
-            _context.Donations.Add(donation);
+            _context.Tithes.Add(tithe);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Donation donation)
+        public async Task UpdateAsync(Tithe tithe)
         {
-            _context.Donations.Update(donation);
+            _context.Tithes.Update(tithe);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var donation = await _context.Donations.FindAsync(id);
-            if (donation != null)
+            var tithe = await _context.Tithes.FindAsync(id);
+            if (tithe != null)
             {
-                _context.Donations.Remove(donation);
+                _context.Tithes.Remove(tithe);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<IEnumerable<Tithe>> GetByUserIdAsync(int userId)
+        {
+            return await _context.Tithes
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
         }
     }
 

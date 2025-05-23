@@ -21,6 +21,16 @@ namespace DonateFaith.Domain.Infra.Data.Mappings
             builder.Property(t => t.TransactionDate)
                    .IsRequired();
 
+            builder
+                    .HasMany(t => t.Donations)
+                    .WithOne(d => d.Transaction)
+                    .HasForeignKey(d => d.TransactionId);
+
+            builder
+                    .HasMany(t => t.Tithes)
+                    .WithOne(ti => ti.Transaction)
+                    .HasForeignKey(ti => ti.TransactionId);
+
             // Descrição da transação
             builder.Property(t => t.Description)
                    .IsRequired()

@@ -1,35 +1,49 @@
 ﻿using DonateFaith.Domain.DTOs;
-using DonateFaith.Domain.Services;
 using DonateFaith.Domain.Interfaces;
+using DonateFaith.Domain.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DonateFaith.Domain.Api.Controllers
 {
     [ApiController]
-    [Route("api/donations")]
+    [Route("api/[controller]")]
     public class DonationController : ControllerBase
     {
-        private readonly DonationService _donationService;
-        private readonly IPaymentService _paymentService;
+        private readonly IDonationService _donationService;
 
-        public DonationController(DonationService donationService, IPaymentService paymentService)
+        public DonationController(IDonationService donationService)
         {
             _donationService = donationService;
-            _paymentService = paymentService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDonations([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        [Authorize(Roles = "Pastor")]
+        public async Task<IActionResult> GetDonations(int page = 1, int pageSize = 10)
         {
-            var response = await _donationService.GetDonationsAsync(page, pageSize);
-            return Ok(response);
+            var donations = await _donationService.GetDonationsAsync(page, pageSize);
+            return Ok(donations);
         }
 
         [HttpPost("checkout")]
-        public async Task<IActionResult> CreateStripeCheckout([FromBody] StripeDonDTO stripeDon)
+        [Authorize] // Qualquer usuário logado pode doar
+        public async Task<IActionResult> Checkout([FromBody] DonationDTO dto)
         {
-            var checkoutUrl = await _paymentService.CreateCheckoutSessionAsync(stripeDon);
-            return Ok(new { checkoutUrl });
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            dto.UserId = userId;
+
+            await _donationService.AddDonationAsync(dto);
+            return Ok(new { message = "Doação realizada com sucesso!" });
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Pastor")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _donationService.DeleteDonationAsync(id);
+            return NoContent();
         }
     }
+
 }

@@ -7,105 +7,62 @@ using Microsoft.AspNetCore.Mvc;
 namespace DonateFaith.Domain.Api.Controllers
 {
     [ApiController]
-    [Route("api/events")]
+    [Route("api/[controller]")]
     public class EventController : ControllerBase
     {
-        private readonly IEventRepository _eventRepository;
+        private readonly IEventService _eventService;
 
-        public EventController(IEventRepository eventRepository)
+        public EventController(IEventService eventService)
         {
-            _eventRepository = eventRepository;
+            _eventService = eventService;
         }
 
-        // Somente pastores podem criar eventos
-        [Authorize(Roles = "Pastor")]
-        [HttpPost]
-        public async Task<IActionResult> CreateEvent([FromBody] EventDTO dto)
-        {
-            var entity = new Event
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-                Date = dto.StartDate,
-                EndDate = dto.EndDate,
-                Location = dto.Location,
-                MaxParticipants = dto.MaxNumber
-            };
-
-            await _eventRepository.AddAsync(entity);
-            return Ok(new ApiResponse<EventDTO>(dto));
-        }
-
-        // Todos podem ver os eventos
-        [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> GetAllEvents()
+        public async Task<IActionResult> GetEvents([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var events = await _eventRepository.GetAllAsync();
-            var result = events.Select(e => new EventDTO
-            {
-                Id = e.Id,
-                Name = e.Name,
-                Description = e.Description,
-                StartDate = e.Date,
-                EndDate = e.EndDate,
-                Location = e.Location,
-                MaxNumber = e.MaxParticipants
-            }).ToList();
-
-            return Ok(new ApiResponse<List<EventDTO>>(result));
+            var events = await _eventService.GetEventsAsync(page, pageSize);
+            return Ok(events);
         }
 
-        // Pastor pode editar
-        [Authorize(Roles = "Pastor")]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEvent(int id, [FromBody] EventDTO dto)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var eventEntity = await _eventRepository.GetByIdAsync(id);
-            if (eventEntity == null)
-                return NotFound(new ApiResponse<string>("Evento não encontrado", 404));
-
-            eventEntity.Name = dto.Name;
-            eventEntity.Description = dto.Description;
-            eventEntity.Date = dto.StartDate;
-            eventEntity.EndDate = dto.EndDate;
-            eventEntity.Location = dto.Location;
-            eventEntity.MaxParticipants = dto.MaxNumber;
-
-            await _eventRepository.UpdateAsync(eventEntity);
-            return Ok(new ApiResponse<EventDTO>(dto));
+            var ev = await _eventService.GetByIdAsync(id);
+            if (ev == null) return NotFound();
+            return Ok(ev);
         }
 
-        // Pastor pode deletar
+        [HttpPost]
         [Authorize(Roles = "Pastor")]
+        public async Task<IActionResult> Add([FromBody] EventDTO dto)
+        {
+            await _eventService.AddAsync(dto);
+            return Ok();
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Pastor")]
+        public async Task<IActionResult> Update([FromBody] EventDTO dto)
+        {
+            await _eventService.UpdateAsync(dto);
+            return Ok();
+        }
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEvent(int id)
+        [Authorize(Roles = "Pastor")]
+        public async Task<IActionResult> Delete(int id)
         {
-            var eventEntity = await _eventRepository.GetByIdAsync(id);
-            if (eventEntity == null)
-                return NotFound(new ApiResponse<string>("Evento não encontrado", 404));
-
-            await _eventRepository.DeleteAsync(eventEntity.Id);
-            return Ok(new ApiResponse<string>("Evento excluído com sucesso"));
+            await _eventService.DeleteAsync(id);
+            return Ok();
         }
 
-        [AllowAnonymous]
-        [HttpGet("by-code/{churchCode}")]
-        public async Task<IActionResult> GetEventsByChurchCode(string churchCode)
+        [HttpGet("by-church-code/{churchCode}")]
+        [Authorize]
+        public async Task<IActionResult> GetByChurchCode(string churchCode)
         {
-            var events = await _eventRepository.GetEventsByChurchCodeAsync(churchCode);
-            var result = events.Select(e => new EventDTO
-            {
-                Id = e.Id,
-                Name = e.Name,
-                Description = e.Description,
-                StartDate = e.Date,
-                EndDate = e.EndDate,
-                Location = e.Location,
-                MaxNumber = e.MaxParticipants,
-            }).ToList();
-
-            return Ok(new ApiResponse<List<EventDTO>>(result));
+            var events = await _eventService.GetEventsByChurchCodeAsync(churchCode);
+            return Ok(events);
         }
     }
+
 }

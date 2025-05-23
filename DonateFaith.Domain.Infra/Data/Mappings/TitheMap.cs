@@ -35,9 +35,18 @@ namespace DonateFaith.Domain.Infra.Data.Mappings
 
             // Relacionamento opcional com Transação
             builder.HasOne(t => t.Transaction)
-                   .WithMany()
+                   .WithMany(tr => tr.Tithes)
                    .HasForeignKey(t => t.TransactionId)
                    .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(t => t.User)
+                   .WithMany(u => u.Tithes)
+                   .HasForeignKey(t => t.UserId);
+
+            builder.HasOne(t => t.User)
+                   .WithMany(u => u.Tithes)
+                   .HasForeignKey(t => t.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
 
         }
     }

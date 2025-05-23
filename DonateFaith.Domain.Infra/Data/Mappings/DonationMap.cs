@@ -59,11 +59,15 @@ namespace DonateFaith.Domain.Infra.Data.Mappings
                    .HasForeignKey(d => d.ChurchId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            // Relacionamento com Transaction (opcional)
             builder.HasOne(d => d.Transaction)
+                       .WithMany(t => t.Donations)
+                       .HasForeignKey(d => d.TransactionId)
+                       .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(d => d.User)
                    .WithMany()
-                   .HasForeignKey(d => d.TransactionId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .HasForeignKey(d => d.UserId) // <- FALTAVA ISSO
+                   .OnDelete(DeleteBehavior.NoAction);
 
             // Relacionamento com User (assumindo que será via e-mail logado)
             builder.HasOne(d => d.User)
