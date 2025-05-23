@@ -7,22 +7,26 @@ using Microsoft.EntityFrameworkCore;
 public class UserRepository : IUserRepository
 {
     private readonly AppDbContext _context;
+
     public UserRepository(AppDbContext context)
     {
         _context = context;
     }
 
-    public async Task<User?> GetByEmailAsync(string email) =>
-        await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    public async Task<IEnumerable<User>> GetUsersAsync(int page, int pageSize)
+    {
+        return await _context.Users
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
 
-    public async Task<User?> GetByCPFAsync(string cpf) =>
-        await _context.Users.FirstOrDefaultAsync(u => u.CPF == cpf);
+    // outras implementações como:
+    public async Task<User> GetByEmailAsync(string email)
+        => await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-    public async Task<User> GetByIdAsync(int id) =>
-        await _context.Users.FindAsync(id);
-
-    public async Task<IEnumerable<User>> GetMembersAsync() =>
-        await _context.Users.Where(u => u.Role == UserRole.Member).ToListAsync();
+    public async Task<User> GetByCPFAsync(string cpf)
+        => await _context.Users.FirstOrDefaultAsync(u => u.CPF == cpf);
 
     public async Task AddAsync(User user)
     {
@@ -30,15 +34,23 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<User> GetByIdAsync(int id)
+        => await _context.Users.FindAsync(id);
+
     public async Task UpdateAsync(User user)
     {
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
     }
-
+    public async Task<IEnumerable<User>> GetMembersAsync()
+    {
+        return await _context.Users
+            .Where(u => u.Role == UserRole.Member)
+            .ToListAsync();
+    }
     public async Task DeleteAsync(int id)
     {
-        var user = await GetByIdAsync(id);
+        var user = await _context.Users.FindAsync(id);
         if (user != null)
         {
             _context.Users.Remove(user);
