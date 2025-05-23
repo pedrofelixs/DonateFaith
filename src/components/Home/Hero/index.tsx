@@ -15,10 +15,10 @@ const Hero = () => {
                                 Nosso sistema digital ajuda líderes a arrecadar contribuições de forma prática, segura e transparente.
                             </p>
                             <div className='flex flex-row md:flex-row items-center justify-center lg:justify-start space-x-6 md:space-x-6'>
-                                <Link href='#donate-section' className='text-xl font-medium rounded-full text-white py-5 px-6 bg-sky-600 hover:text-primary border-primary hover:bg-transparent'>
+                                <Link href='/login' className='text-xl font-medium rounded-full text-white py-5 px-6 bg-sky-600 hover:text-primary border-primary hover:bg-transparent'>
                                     Quero Conhecer
                                 </Link>
-                                <Link href='#sobre-section' className='flex border border-primary justify-center rounded-full text-xl font-medium items-center py-5 px-10 text-primary hover:text-white hover:bg-primary'>
+                                <Link href='#donate-section' className='flex border border-primary justify-center rounded-full text-xl font-medium items-center py-5 px-10 text-primary hover:text-white hover:bg-primary'>
                                     Ver Funcionalidades
                                 </Link>
                             </div>
