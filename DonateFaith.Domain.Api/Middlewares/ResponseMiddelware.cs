@@ -2,11 +2,11 @@
 
 namespace DonateFaith.Domain.Api.Middlewares
 {
-    public class ResponseMiddelware
+    public class ResponseMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public ResponseMiddelware(RequestDelegate next)
+        public ResponseMiddleware(RequestDelegate next)
         {
             _next = next;
         }
@@ -14,25 +14,21 @@ namespace DonateFaith.Domain.Api.Middlewares
         public async Task InvokeAsync(HttpContext context)
         {
             var originalBodyStream = context.Response.Body;
-            using (var responseBody = new MemoryStream())
-            {
-                context.Response.Body = responseBody;
 
-                await _next(context);
+            using var responseBody = new MemoryStream();
+            context.Response.Body = responseBody;
 
-                context.Response.Body.Seek(0, SeekOrigin.Begin);
-                var body = await new StreamReader(context.Response.Body).ReadToEndAsync();
-                context.Response.Body.Seek(0, SeekOrigin.Begin);
+            await _next(context); // processa pipeline
 
-                var response = new
-                {
-                    Data = context.Response.StatusCode >= 200 && context.Response.StatusCode < 300 ? JsonSerializer.Deserialize<object>(body) : null,
-                    Error = context.Response.StatusCode >= 400 ? new { Message = body, Code = context.Response.StatusCode } : null
-                };
+            context.Response.Body.Seek(0, SeekOrigin.Begin);
+            var text = await new StreamReader(context.Response.Body).ReadToEndAsync();
+            context.Response.Body.Seek(0, SeekOrigin.Begin);
 
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync(JsonSerializer.Serialize(response));
-            }
+            // você pode fazer logs aqui com `text`, se quiser
+
+            await responseBody.CopyToAsync(originalBodyStream); // 👈 Copia de volta para o response final
+            context.Response.Body = originalBodyStream;
         }
     }
+
 }

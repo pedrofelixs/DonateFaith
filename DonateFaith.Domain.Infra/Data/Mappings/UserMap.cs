@@ -39,7 +39,7 @@ namespace DonateFaith.Domain.Infra.Data.Mappings
             builder.HasOne(u => u.Church)
                     .WithMany(c => c.Users)
                     .HasForeignKey(u => u.ChurchId)
-                    .IsRequired();
+                    .IsRequired(false);
 
             // Relacionamento com AdminChurch (N:N)
             builder.HasMany(u => u.AdminChurches)

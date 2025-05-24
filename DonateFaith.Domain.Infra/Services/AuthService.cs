@@ -27,6 +27,10 @@ namespace DonateFaith.Domain.Infra.Services
 
         public async Task<AuthResponseDTO> AuthenticateAsync(LoginDTO login)
         {
+            if (string.IsNullOrEmpty(login.Email) || string.IsNullOrEmpty(login.Password))
+                throw new ArgumentException("Email and password are required.");
+
+
             var user = await _userRepository.GetByEmailAsync(login.Email);
             if (user == null || !BCrypt.Net.BCrypt.Verify(login.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid credentials.");

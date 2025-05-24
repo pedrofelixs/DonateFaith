@@ -8,19 +8,16 @@ namespace DonateFaith.Domain.DTOs
 {
     public class ApiResponse<T>
     {
-        public T Data { get; set; }
-        public object Error { get; set; }
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public T? Data { get; set; }
+        public List<string>? Errors { get; set; }
 
-        public ApiResponse(T data)
-        {
-            Data = data;
-            Error = null;
-        }
+        public static ApiResponse<T> SuccessResponse(T data, string message = "")
+            => new() { Success = true, Message = message, Data = data };
 
-        public ApiResponse(string errorMessage, int code)
-        {
-            Data = default;
-            Error = new { Message = errorMessage, Code = code };
-        }
+        public static ApiResponse<T> ErrorResponse(string message, List<string>? errors = null)
+            => new() { Success = false, Message = message, Errors = errors };
     }
+
 }

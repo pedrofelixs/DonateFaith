@@ -2,6 +2,7 @@ using DonateFaith.Domain.Api;
 using DonateFaith.Domain.Api.Middlewares;
 using DonateFaith.Domain.Infra.Data;
 using DonateFaith.Domain.Infra.Repositories;
+using DonateFaith.Domain.Infra.Services;
 using DonateFaith.Domain.Interfaces;
 using DonateFaith.Domain.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IDonationRepository, DonationRepository>();
 builder.Services.AddScoped<ITitheRepository, TitheRepository>();
+builder.Services.AddScoped<AuthService>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -110,7 +112,7 @@ app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<ResponseMiddelware>();
+
 app.MapControllers();
 
 app.Run();

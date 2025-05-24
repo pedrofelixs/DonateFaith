@@ -21,15 +21,27 @@ public class UserRepository : IUserRepository
             .ToListAsync();
     }
 
+    public async Task<User?> GetByEmailAsync(string email)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user == null)
+        {
+            // Retorno seguro para evitar erros
+            return null;
+        }
+        return user;
+    }
+
     // outras implementações como:
-    public async Task<User> GetByEmailAsync(string email)
-        => await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    //public async Task<User> GetByEmailAsync(string email)
+        //=> await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
     public async Task<User> GetByCPFAsync(string cpf)
         => await _context.Users.FirstOrDefaultAsync(u => u.CPF == cpf);
 
     public async Task AddAsync(User user)
     {
+        user.Name = user.FullName.Split(' ')[0];
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
     }

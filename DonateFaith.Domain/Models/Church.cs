@@ -17,7 +17,7 @@ namespace DonateFaith.Domain.Models
         public string Address { get; set; }
         public string Phone { get; set; }
         public DateTime FoundedDate { get; set; }
-        public ICollection<User> Users { get; set; }
+        public ICollection<User>? Users { get; set; }
         public ICollection<Donation> Donations { get; set; }
         public ICollection<Tithe> Tithes { get; set; }
         public ICollection<Transaction> Transactions { get; set; } 
