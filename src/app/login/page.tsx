@@ -70,7 +70,7 @@ const LoginPage = () => {
       : {
           fullName: formData.nome,
           email: formData.email,
-          role: 0,
+          role: 1,
           cpf: formData.cpf,
           password: formData.senha,
         };
