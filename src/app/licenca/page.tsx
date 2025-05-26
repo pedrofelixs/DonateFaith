@@ -39,9 +39,17 @@ const LicencasPage = () => {
   const router = useRouter();
 
   const handleComprar = (tipo: string) => {
+  const token = localStorage.getItem("token");
+  console.log(token);
+
+  if (token && token !== "undefined" && token !== "null" && token.trim() !== "") {
     alert(`Licença ${tipo} comprada com sucesso!`);
-    router.push("/");
-  };
+    router.push("/cadastrarigreja");
+  } else {
+    alert("Você precisa estar logado para comprar uma licença.");
+    router.push("/login");
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 py-12">
