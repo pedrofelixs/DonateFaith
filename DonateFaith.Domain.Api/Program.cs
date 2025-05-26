@@ -1,5 +1,3 @@
-using DonateFaith.Domain.Api;
-using DonateFaith.Domain.Api.Middlewares;
 using DonateFaith.Domain.Infra.Data;
 using DonateFaith.Domain.Infra.Repositories;
 using DonateFaith.Domain.Infra.Services;
@@ -35,7 +33,7 @@ builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<ITitheService, TitheService>();
-
+builder.Services.AddScoped<IChurchService, ChurchService>();
 // Token Generator
 builder.Services.AddScoped<ITokenService, TokenService>();
 

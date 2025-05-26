@@ -55,7 +55,7 @@ namespace DonateFaith.Domain.Infra.Services
                 FullName = dto.FullName,
                 Email = dto.Email,
                 CPF = dto.CPF,
-                Role = UserRole.Member, // Por padrão (ou user comum se preferir)
+                Role = dto.Role, // Por padrão (ou user comum se preferir)
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
             };
 
