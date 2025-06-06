@@ -17,17 +17,20 @@ namespace DonateFaith.Domain.Infra.Services
 
         public async Task<ChurchDTO?> GetChurchByPastorIdAsync(int pastorId)
         {
-            var user = await _context.Users.Include(u => u.Church)
-                                           .FirstOrDefaultAsync(u => u.Id == pastorId && u.Role == UserRole.Pastor);
+            var church = await _context.Churches
+                                       .FirstOrDefaultAsync(c => c.PastorId == pastorId);
 
-            return user?.Church == null ? null : new ChurchDTO
+            if (church == null) return null;
+
+            return new ChurchDTO
             {
-                Id = user.Church.Id,
-                Name = user.Church.Name,
-                CNPJ = user.Church.CNPJ,
-                Address = user.Church.Address,
-                Phone = user.Church.Phone,
-                FoundedDate = user.Church.FoundedDate
+                PastorId = church.PastorId,
+                Id = church.Id,
+                Name = church.Name,
+                CNPJ = church.CNPJ,
+                Address = church.Address,
+                Phone = church.Phone,
+                FoundedDate = church.FoundedDate
             };
         }
 
@@ -55,7 +58,7 @@ namespace DonateFaith.Domain.Infra.Services
             _context.Churches.Add(church);
             await _context.SaveChangesAsync();
 
-            pastor.Church = church;
+            pastor.ChurchId = church.Id; // ✅ correto
             await _context.SaveChangesAsync();
 
             return church.Code; // retorno do código
@@ -69,6 +72,8 @@ namespace DonateFaith.Domain.Infra.Services
 
             return new ChurchDTO
             {
+                Id = church.Id,
+                PastorId = church.PastorId,
                 Name = church.Name,
                 Address = church.Address,
                 CNPJ = church.CNPJ,

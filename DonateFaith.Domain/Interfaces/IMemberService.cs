@@ -12,7 +12,7 @@ namespace DonateFaith.Domain.Interfaces
  
             Task<IEnumerable<UserDTO>> GetAllMembersAsync();
             Task<UserDTO?> GetMemberByIdAsync(int id);
-            Task AddMemberAsync(UserDTO member);
+            Task AddMemberAsync(CreateMemberDTO member, int pastorId);
             Task UpdateMemberAsync(UserDTO member);
             Task DeleteMemberAsync(int id);
        

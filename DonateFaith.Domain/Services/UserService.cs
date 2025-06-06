@@ -48,18 +48,40 @@ namespace DonateFaith.Domain.Services
 
         public async Task<UserDTO> RegisterUserAsync(RegisterUserDTO registerUserDto)
         {
-            var userExists = await _userRepository.GetByEmailAsync(registerUserDto.Email);
-            if (userExists != null)
-                throw new Exception("Usuário já registrado.");
+            // CPF já existe?
+            var existingUser = await _userRepository.GetByCPFAsync(registerUserDto.CPF);
 
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(registerUserDto.Password);
+            if (existingUser != null)
+            {
+                // Atualiza usuário existente
+                if (!string.IsNullOrEmpty(existingUser.Email))
+                    throw new Exception("Usuário já registrado com este CPF.");
 
+                existingUser.Email = registerUserDto.Email;
+                existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerUserDto.Password);
+                existingUser.FullName = registerUserDto.FullName;
+                existingUser.Name = registerUserDto.FullName.Split(' ')[0];
+                existingUser.Role = UserRole.Member; // força member
+
+                await _userRepository.UpdateAsync(existingUser);
+
+                return new UserDTO
+                {
+                    Id = existingUser.Id,
+                    FullName = existingUser.Name,
+                    Email = existingUser.Email,
+                    Role = existingUser.Role
+                };
+            }
+
+            // Novo usuário (CPF ainda não registrado)
             var user = new User
             {
-                Name = registerUserDto.FullName,
+                Name = registerUserDto.FullName.Split(' ')[0],
+                FullName = registerUserDto.FullName,
                 Email = registerUserDto.Email,
-                PasswordHash = passwordHash,
                 CPF = registerUserDto.CPF,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerUserDto.Password),
                 Role = registerUserDto.Role
             };
 
@@ -74,6 +96,7 @@ namespace DonateFaith.Domain.Services
             };
         }
 
+
         public async Task<string> AuthenticateAsync(LoginDTO loginDto)
         {
             var user = await _userRepository.GetByEmailAsync(loginDto.Email);
@@ -82,9 +105,9 @@ namespace DonateFaith.Domain.Services
 
             var claims = new[]
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim("UserId", user.Id.ToString())
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -115,6 +138,40 @@ namespace DonateFaith.Domain.Services
         public async Task DeleteAsync(int id)
         {
             await _userRepository.DeleteAsync(id);
+        }
+        public async Task AddMemberAsync(UserDTO dto, int pastorId)
+        {
+            var pastor = await _userRepository.GetByIdAsync(pastorId);
+            if (pastor == null || pastor.Role != UserRole.Pastor || pastor.ChurchId == null)
+                throw new Exception("Pastor inválido ou não vinculado a uma igreja.");
+
+            // Verifica se já existe usuário com o mesmo CPF
+            var existingUser = await _userRepository.GetByCPFAsync(dto.CPF);
+
+            if (existingUser != null)
+            {
+                // Atualiza para membro, vincula à igreja do pastor
+                existingUser.Role = UserRole.Member;
+                existingUser.ChurchId = pastor.ChurchId;
+                existingUser.Name = dto.FullName.Split(' ')[0];
+                existingUser.FullName = dto.FullName;
+
+                await _userRepository.UpdateAsync(existingUser);
+            }
+            else
+            {
+                // Cria novo usuário como membro, só com nome e CPF
+                var newUser = new User
+                {
+                    CPF = dto.CPF,
+                    Name = dto.FullName.Split(' ')[0],
+                    FullName = dto.FullName,
+                    Role = UserRole.Member,
+                    ChurchId = pastor.ChurchId
+                };
+
+                await _userRepository.AddAsync(newUser);
+            }
         }
     }
 }

@@ -54,6 +54,8 @@ namespace DonateFaith.Domain.Services
         {
             var ev = new Event
             {
+                OrganizerId = dto.OrganizerId,
+                ChurchId = dto.ChurchId, 
                 Name = dto.Name,
                 Description = dto.Description,
                 Date = dto.StartDate,

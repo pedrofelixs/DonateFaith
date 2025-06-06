@@ -46,9 +46,12 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<User> GetByIdAsync(int id)
-        => await _context.Users.FindAsync(id);
-
+    public async Task<User?> GetByIdAsync(int id)
+    {
+        return await _context.Users
+            .Include(u => u.Church) // opcional, se for usar .Church depois
+            .FirstOrDefaultAsync(u => u.Id == id);
+    }
     public async Task UpdateAsync(User user)
     {
         _context.Users.Update(user);

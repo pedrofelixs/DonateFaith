@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Mappings\" />
+    <Compile Remove="Data\Mappings\**" />
+    <Compile Remove="Migrations\**" />
+    <EmbeddedResource Remove="Data\Mappings\**" />
+    <EmbeddedResource Remove="Migrations\**" />
+    <None Remove="Data\Mappings\**" />
+    <None Remove="Migrations\**" />
   </ItemGroup>
 
   <ItemGroup>

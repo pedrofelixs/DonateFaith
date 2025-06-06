@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DonateFaith.Domain.Models;
+﻿using DonateFaith.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using DonateFaith.Domain.Infra.Data;
-using DonateFaith.Domain.Infra.Data.Mappings;
+
 
 
 namespace DonateFaith.Domain.Infra.Data
@@ -37,19 +31,109 @@ namespace DonateFaith.Domain.Infra.Data
                 options.UseSqlServer(connString);
             }
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Aplica todos os mapeamentos
-            modelBuilder.ApplyConfiguration(new AdminChurchMap());
-            modelBuilder.ApplyConfiguration(new ChurchMap());
-            modelBuilder.ApplyConfiguration(new DonationMap());
-            modelBuilder.ApplyConfiguration(new EventMap());
-            modelBuilder.ApplyConfiguration(new FinancialReportMap());
-            modelBuilder.ApplyConfiguration(new PostMap());
-            modelBuilder.ApplyConfiguration(new UserMap());
-            modelBuilder.ApplyConfiguration(new TitheMap());
-            modelBuilder.ApplyConfiguration(new TransactionMap());
+            base.OnModelCreating(modelBuilder);
+
+
+            modelBuilder.Entity<AdminChurch>()
+            .HasKey(ac => new { ac.AdminId, ac.ChurchId });
+
+            // Configurar relacionamentos (opcional, mas recomendado)
+            modelBuilder.Entity<AdminChurch>()
+                .HasOne(ac => ac.Admin)
+                .WithMany() // Se quiser, pode configurar a navegação inversa no User
+                .HasForeignKey(ac => ac.AdminId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<AdminChurch>()
+                .HasOne(ac => ac.Church)
+                .WithMany() // Se quiser, pode configurar a navegação inversa no Church
+                .HasForeignKey(ac => ac.ChurchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔗 Church.Pastor (1:1)
+            modelBuilder.Entity<Church>()
+                .HasOne(c => c.Pastor)
+                .WithOne() // sem navegação em User
+                .HasForeignKey<Church>(c => c.PastorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔗 Church.Users (1:N - Membros)
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Church)
+                .WithMany(c => c.Users)
+                .HasForeignKey(u => u.ChurchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔗 Tithe.User (1:N)
+            modelBuilder.Entity<Tithe>()
+                .HasOne(t => t.User)
+                .WithMany(u => u.Tithes)
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔗 Tithe.Member (1:1 ou N:1)
+            modelBuilder.Entity<Tithe>()
+                .HasOne(t => t.Member)
+                .WithMany() // sem navegação reversa
+                .HasForeignKey(t => t.MemberId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔗 Tithe.Church
+            modelBuilder.Entity<Tithe>()
+                .HasOne(t => t.Church)
+                .WithMany(c => c.Tithes)
+                .HasForeignKey(t => t.ChurchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔗 Donation.User
+            modelBuilder.Entity<Donation>()
+                .HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔗 Donation.Church
+            modelBuilder.Entity<Donation>()
+                .HasOne(d => d.Church)
+                .WithMany(c => c.Donations)
+                .HasForeignKey(d => d.ChurchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<Donation>()
+                .HasOne(d => d.Transaction)
+                .WithMany()
+                .HasForeignKey(d => d.TransactionId);
+
+
+            // 🔗 Event.Organizer
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.Organizer)
+                .WithMany()
+                .HasForeignKey(e => e.OrganizerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔗 Event.Church
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.Church)
+                .WithMany(c => c.Events)
+                .HasForeignKey(e => e.ChurchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 🔗 Transaction (Donation / Tithe) — se necessário
+            modelBuilder.Entity<Donation>()
+                .HasOne(d => d.Transaction)
+                .WithOne()
+                .HasForeignKey<Donation>(d => d.TransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Tithe>()
+                .HasOne(t => t.Transaction)
+                .WithOne()
+                .HasForeignKey<Tithe>(t => t.TransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
     }

@@ -16,7 +16,5 @@ namespace DonateFaith.Domain.Models
         public decimal Amount { get; set; }
         public DateTime TransactionDate { get; set; }
         public string Description { get; set; }
-        public ICollection<Donation> Donations { get; set; }
-        public ICollection<Tithe> Tithes { get; set; }
     }
 }

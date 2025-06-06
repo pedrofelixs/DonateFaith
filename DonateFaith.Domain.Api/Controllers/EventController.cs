@@ -3,6 +3,7 @@ using DonateFaith.Domain.Interfaces;
 using DonateFaith.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DonateFaith.Domain.Api.Controllers
 {
@@ -17,6 +18,7 @@ namespace DonateFaith.Domain.Api.Controllers
             _eventService = eventService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetEvents([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
@@ -24,6 +26,7 @@ namespace DonateFaith.Domain.Api.Controllers
             return Ok(events);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -32,13 +35,17 @@ namespace DonateFaith.Domain.Api.Controllers
             return Ok(ev);
         }
 
-        [HttpPost]
         [Authorize(Roles = "Pastor")]
-        public async Task<IActionResult> Add([FromBody] EventDTO dto)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] EventDTO dto)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            dto.OrganizerId = userId;
+
             await _eventService.AddAsync(dto);
-            return Ok();
+            return Ok(new { message = "Evento criado com sucesso!" });
         }
+
 
         [HttpPut]
         [Authorize(Roles = "Pastor")]
@@ -57,7 +64,7 @@ namespace DonateFaith.Domain.Api.Controllers
         }
 
         [HttpGet("by-church-code/{churchCode}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetByChurchCode(string churchCode)
         {
             var events = await _eventService.GetEventsByChurchCodeAsync(churchCode);

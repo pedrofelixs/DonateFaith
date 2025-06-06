@@ -2,6 +2,7 @@
 using DonateFaith.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DonateFaith.Domain.Api.Controllers
 {
@@ -33,11 +34,18 @@ namespace DonateFaith.Domain.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(UserDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateMemberDTO dto)
         {
-            await _memberService.AddMemberAsync(dto);
-            return Ok();
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null)
+                return Unauthorized("Token sem claim de identificação.");
+
+            var pastorId = int.Parse(claim.Value);
+            await _memberService.AddMemberAsync(dto, pastorId);
+            return Ok(new { message = "Membro registrado com sucesso!" });
         }
+
+
 
         [HttpPut]
         public async Task<IActionResult> Update(UserDTO dto)

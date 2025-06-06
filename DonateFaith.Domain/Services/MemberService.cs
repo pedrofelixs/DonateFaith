@@ -8,10 +8,11 @@ namespace DonateFaith.Domain.Services
     public class MemberService : IMemberService
     {
         private readonly IMemberRepository _memberRepository;
-
-        public MemberService(IMemberRepository memberRepository)
+        private readonly IUserRepository _userRepository;
+        public MemberService(IMemberRepository memberRepository, IUserRepository userRepository)
         {
             _memberRepository = memberRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<IEnumerable<UserDTO>> GetAllMembersAsync()
@@ -40,29 +41,63 @@ namespace DonateFaith.Domain.Services
             };
         }
 
-        public async Task AddMemberAsync(UserDTO dto)
+        public async Task AddMemberAsync(CreateMemberDTO dto, int pastorId)
         {
-            var member = new User
-            {
-                Name = dto.FullName,
-                Email = dto.Email,
-                Role = UserRole.Member,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
-            };
+            var pastor = await _userRepository.GetByIdAsync(pastorId);
 
-            await _memberRepository.AddMemberAsync(member);
+            if (pastor == null)
+                throw new Exception($"Pastor com ID {pastorId} não foi encontrado.");
+
+            if (pastor.Role != UserRole.Pastor)
+                throw new Exception("Usuário não é um pastor.");
+
+            if (pastor.ChurchId == null)
+                throw new Exception("Pastor não está vinculado a nenhuma igreja.");
+
+            var existingUser = await _userRepository.GetByCPFAsync(dto.CPF);
+
+            if (existingUser != null)
+            {
+                existingUser.Role = UserRole.Member;
+                existingUser.ChurchId = pastor.ChurchId;
+                existingUser.FullName = dto.FullName;
+                existingUser.Name = dto.FullName.Split(' ')[0];
+                existingUser.Email ??= dto.Email;
+
+                await _userRepository.UpdateAsync(existingUser);
+            }
+            else
+            {
+                var member = new User
+                {
+                    FullName = dto.FullName,
+                    Name = dto.FullName.Split(' ')[0],
+                    CPF = dto.CPF,
+                    Email = dto.Email,
+                    Role = UserRole.Member,
+                    ChurchId = pastor.ChurchId
+                };
+
+                await _userRepository.AddAsync(member);
+            }
         }
+
 
         public async Task UpdateMemberAsync(UserDTO dto)
         {
-            var member = await _memberRepository.GetMemberByIdAsync(dto.Id);
+            if (dto.Id == null) throw new Exception("ID do membro não informado.");
+
+            var member = await _memberRepository.GetMemberByIdAsync(dto.Id.Value);
             if (member != null)
             {
-                member.Name = dto.FullName;
+                member.FullName = dto.FullName;
+                member.Name = dto.FullName.Split(' ')[0];
                 member.Email = dto.Email;
+
                 await _memberRepository.UpdateMemberAsync(member);
             }
         }
+
 
         public async Task DeleteMemberAsync(int id)
         {

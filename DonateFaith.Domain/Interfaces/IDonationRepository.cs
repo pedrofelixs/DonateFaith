@@ -12,8 +12,12 @@ namespace DonateFaith.Domain.Interfaces
     {
         Task<IEnumerable<Donation>> GetDonationsAsync(int page, int pageSize);
         Task<Donation> GetByIdAsync(int id);
+        Task<IEnumerable<Donation>> GetByChurchCodeAsync(string churchCode); // <-- NOVO
+        Task<Donation> GetOnlyDonationAsync(); // <-- NOVO
+
         Task AddAsync(Donation donation);
         Task UpdateAsync(Donation donation);
         Task DeleteAsync(int id);
     }
+
 }

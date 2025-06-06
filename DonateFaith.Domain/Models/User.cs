@@ -12,14 +12,14 @@ namespace DonateFaith.Domain.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string FullName { get; set; }
-        public string CPF {  get; set; }
+        public string CPF { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public UserRole Role { get; set; }
         public int? ChurchId { get; set; }
         public Church? Church { get; set; }
-        public string? ChurchCode { get; set; }
-        public ICollection<AdminChurch> AdminChurches { get; set; } = new List<AdminChurch>();
-        public ICollection<Tithe> Tithes { get; set; } = new List<Tithe>();
+
+        public List<AdminChurch> AdminChurches { get; set; } = new List<AdminChurch>();
+        public List<Tithe> Tithes { get; set; } = new List<Tithe>();
     }
 }
