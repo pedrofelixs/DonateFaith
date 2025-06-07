@@ -70,7 +70,7 @@ const CadastrarEvento = () => {
     };
   
     try {
-      const res = await fetch('http://localhost:5000/api/eventos', {
+      const res = await fetch('http://localhost:5289/api/Event', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -122,6 +122,7 @@ const CadastrarEvento = () => {
 
             <div className="flex space-x-2">
             <input
+            placeholder='Data de Começo'
                 type="date"
                 name="startDate"
                 value={formData.startDate}
@@ -130,6 +131,7 @@ const CadastrarEvento = () => {
                 required
             />
             <input
+            placeholder='Data de Fim'
                 type="date"
                 name="endDate"
                 value={formData.endDate}
