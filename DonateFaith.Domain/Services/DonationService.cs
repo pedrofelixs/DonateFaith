@@ -85,6 +85,9 @@ public class DonationService : IDonationService
     private static DonationDTO ToDto(Donation d) => new DonationDTO
     {
         Id = d.Id,
+        Name= d.Name,
+        Description = d.Description,
+        GoalsAmount =d.GoalsAmount,
         Amount = d.Amount,
         Date = d.DonationDate,
         UserId = d.UserId,
