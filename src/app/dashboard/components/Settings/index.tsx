@@ -12,7 +12,7 @@ export default function SettingsTabs() {
       <Tabs.List className="px-5 mt-6 flex w-full items-center gap-4 border-b border-gray-700/40">
         <TabItem
           value="tab1"
-          tittle="Detalhes"
+          tittle="Código"
           isSelected={currentTab === "tab1"}
         />
         <TabItem

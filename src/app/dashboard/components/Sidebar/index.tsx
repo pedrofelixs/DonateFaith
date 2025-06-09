@@ -10,12 +10,6 @@ export default function Sidebar() {
   return (
     <aside className="flex flex-col min-h-screen gap-6 border-r border-gray-900/60 px-5 py-8">
       <Logo />
-      <Input.Root>
-        <Input.Prefix>
-          <Search className="h-5 w-5 text-gray-500 shrink-0" />
-        </Input.Prefix>
-        <Input.Control placeholder="Search" />
-      </Input.Root>
 
       <nav className="space-y-2">
         <NavItem title="Home" icon={Home} children={[{ label: "Dashboard", href: "/dashboard" }]} />

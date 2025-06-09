@@ -102,7 +102,7 @@ const CadastroIgreja = () => {
       alert("Token inválido ou não encontrado.");
       return;
     }
-
+    console.log(pastorId);
     try {
       const token = localStorage.getItem("token");
 
