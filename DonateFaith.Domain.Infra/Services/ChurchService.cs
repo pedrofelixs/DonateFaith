@@ -47,6 +47,7 @@ namespace DonateFaith.Domain.Infra.Services
 
             var church = new Church
             {
+                PastorId = dto.PastorId,
                 Name = dto.Name,
                 CNPJ = dto.CNPJ,
                 Address = dto.Address,
