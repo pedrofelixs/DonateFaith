@@ -3,22 +3,34 @@
 import { ElementType, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface NavItemProps {
   title: string;
   icon: ElementType;
+  href?: string;
   children?: { label: string; href: string }[];
 }
 
-export function NavItem({ title, icon: Icon, children }: NavItemProps) {
+export function NavItem({ title, icon: Icon, href, children }: NavItemProps) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const hasChildren = children && children.length > 0;
+
+  const handleClick = () => {
+    if (hasChildren) {
+      setOpen(!open);
+    } else if (href) {
+      router.push(href);
+    }
+  };
 
   return (
     <div>
       <button
-        onClick={() => hasChildren && setOpen(!open)}
+        onClick={handleClick}
         className="group w-full flex items-center gap-3 rounded px-3 py-2 hover:bg-gray-700 transition-colors"
+        type="button"
       >
         <Icon className="h-5 w-5 text-gray-500 group-hover:text-blue-300" />
         <span className="flex-1 text-left text-gray-300 group-hover:text-blue-300">

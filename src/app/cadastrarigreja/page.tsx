@@ -83,14 +83,19 @@ const CadastroIgreja = () => {
     }
 
     try {
-
-      await axios.post(`http://localhost:5289/api/church/${pastorId}`, {
-        name: formData.name,
-        cnpj: formData.cnpj,
-        address: formData.address,
-        phone: formData.phone,
-        foundedDate: formData.foundedDate,
-      });
+      console.log(pastorId);
+      await axios.post(`http://localhost:5289/api/church`, {
+      pastorId: pastorId,
+      name: formData.name,
+      cnpj: formData.cnpj,
+      address: formData.address,
+      phone: formData.phone,
+      foundedDate: formData.foundedDate,
+  }, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+});
 
       alert("Igreja cadastrada com sucesso!");
       router.push("/");

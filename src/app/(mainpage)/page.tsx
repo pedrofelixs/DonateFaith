@@ -4,11 +4,11 @@ import Benefits from "@/components/Home/Benefits";
 import AboutUs from "@/components/Home/AboutUs";
 export default function Home() {
     return(
-        <main>
-            <Hero />
-            <Cards />
-            <Benefits />
-            <AboutUs />
-        </main>
+      <div> 
+        <Hero />
+        <Cards />
+        <Benefits />
+        <AboutUs />
+    </div> 
     );
 }

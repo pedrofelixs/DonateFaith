@@ -37,8 +37,7 @@ export default function Sidebar() {
 
       <div className="mt-auto flex flex-col gap-6">
         <nav className="space-y-2">
-          <NavItem title="Suporte" icon={Cog} />
-          <NavItem title="Configurações" icon={LifeBuoy} />
+          <NavItem title="Editar igreja" icon={Cog} href= "/dashboard/editarigreja"/>
         </nav>
       </div>
 

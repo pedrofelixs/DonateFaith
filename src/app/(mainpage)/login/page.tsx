@@ -57,46 +57,55 @@ const LoginPage = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
+  e.preventDefault();
+  if (!validate()) return;
 
-    setLoading(true);
-    const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
-    const payload = isLogin
-      ? {
-          email: formData.email,
-          password: formData.senha,
-        }
-      : {
-          fullName: formData.nome,
-          email: formData.email,
-          role: 1,
-          cpf: formData.cpf,
-          password: formData.senha,
-        };
-
-    try {
-      const res = await axios.post(`http://localhost:5289${endpoint}`, payload);
-
-      if (isLogin) {
-        console.log(res)
-        localStorage.setItem("token", res.data.data.token);
-        router.push("/licenca");
-      } else {
-        alert("Cadastro realizado com sucesso!");
-        setIsLogin(true);
+  setLoading(true);
+  const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
+  const payload = isLogin
+    ? {
+        email: formData.email,
+        password: formData.senha,
       }
-    } catch (error: any) {
-      const message =
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        error.message ||
-        "Erro na requisição.";
-      alert(message);
-    } finally {
-      setLoading(false);
+    : {
+        fullName: formData.nome,
+        email: formData.email,
+        role: 1,
+        cpf: formData.cpf,
+        password: formData.senha,
+      };
+
+  try {
+    const res = await axios.post(`http://localhost:5289${endpoint}`, payload);
+
+    if (isLogin) {
+      localStorage.setItem("token", res.data.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.data.user));
+
+      const church = res.data.data.churchId;
+      console.log("Igreja ID:", church);
+
+      if (church != 0) {
+        router.push("/dashboard");
+      } else {
+        router.push("/licenca");
+      }
+    } else {
+      alert("Cadastro realizado com sucesso!");
+      setIsLogin(true);
     }
-  };
+  } catch (error: any) {
+    const message =
+      error.response?.data?.error ||
+      error.response?.data?.message ||
+      error.message ||
+      "Erro na requisição.";
+    alert(message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 px-4">

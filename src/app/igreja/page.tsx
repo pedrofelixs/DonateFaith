@@ -8,12 +8,12 @@ interface Event {
   title: string;
   date: string;
   description: string;
+  location: string; // adicionando localização
 }
 
 interface Church {
   name: string;
   address: string;
-  events: Event[];
 }
 
 const IgrejaPage = () => {
@@ -21,22 +21,37 @@ const IgrejaPage = () => {
   const code = searchParams.get("code");
 
   const [church, setChurch] = useState<Church | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (code) {
-      axios
-        .get(`http://localhost:5289/api/church/code/${code}`)
-        .then((res) => {
-          setChurch(res.data);
-        })
-        .catch((err) => {
-          console.error("Erro ao buscar igreja:", err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+    if (!code) return;
+
+    setLoading(true);
+
+    const churchRequest = axios.get(`http://localhost:5289/api/church/code/${code}`);
+    const eventsRequest = axios.get(`http://localhost:5289/api/Event/by-church-code/${code}`);
+
+    Promise.all([churchRequest, eventsRequest])
+      .then(([churchRes, eventsRes]) => {
+        setChurch(churchRes.data);
+
+        const mappedEvents = eventsRes.data.map((e: any) => ({
+          id: e.id,
+          title: e.name,
+          date: e.startDate,
+          description: e.description,
+          location: e.location, // pegando localização do evento
+        }));
+
+        setEvents(mappedEvents);
+      })
+      .catch((err) => {
+        console.error("Erro ao buscar dados:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [code]);
 
   if (loading) return <p className="text-center mt-10">Carregando...</p>;
@@ -65,13 +80,13 @@ const IgrejaPage = () => {
         {/* Eventos */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Eventos</h2>
-          {church.events?.length > 0 ? (
+          {events.length > 0 ? (
             <ul className="space-y-4">
-              {church.events.map((event) => (
+              {events.map((event) => (
                 <li key={event.id} className="border-l-4 border-sky-500 pl-4">
                   <p className="font-bold">{event.title}</p>
                   <p className="text-sm text-gray-500">
-                    {new Date(event.date).toLocaleDateString()}
+                    {new Date(event.date).toLocaleDateString()} - <em>{event.location}</em>
                   </p>
                   <p>{event.description}</p>
                 </li>

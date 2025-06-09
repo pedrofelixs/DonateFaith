@@ -18,6 +18,7 @@ const MobileHeaderLink = () => {
                 <button
                     className='text-black dark:text-white md:hidden'
                     onClick={toggleMenu}
+                    title=" Toggle Menu"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"

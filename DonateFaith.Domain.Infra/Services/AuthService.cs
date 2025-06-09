@@ -40,7 +40,8 @@ namespace DonateFaith.Domain.Infra.Services
             {
                 Token = token,
                 Role = user.Role.ToString(),
-                UserName = user.FullName
+                UserName = user.FullName,
+                ChurchId = user.ChurchId ?? 0
             };
         }
 
