@@ -111,6 +111,22 @@ namespace DonateFaith.Domain.Infra.Services
             _context.Churches.Remove(church);
             await _context.SaveChangesAsync();
         }
+        public async Task<ChurchDTO?> GetChurchByIdAsync(int id)
+        {
+            var church = await _context.Churches.FindAsync(id);
+            if (church == null) return null;
+
+            return new ChurchDTO
+            {
+                Id = church.Id,
+                PastorId = church.PastorId,
+                Name = church.Name,
+                CNPJ = church.CNPJ,
+                Address = church.Address,
+                Phone = church.Phone,
+                FoundedDate = church.FoundedDate
+            };
+        }
 
         private string GenerateRandomCode(int length)
         {

@@ -13,6 +13,7 @@ namespace DonateFaith.Domain.Interfaces
 
         Task<ChurchDTO?> GetChurchByPastorIdAsync(int pastorId);
         Task UpdateChurchAsync(ChurchDTO dto);
+        Task<ChurchDTO?> GetChurchByIdAsync(int churchId);
         Task DeleteChurchAsync(int pastorId);
         Task<ChurchDTO?> GetChurchByCodeAsync(string code);
     }

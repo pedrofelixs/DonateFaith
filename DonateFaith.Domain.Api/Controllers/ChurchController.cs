@@ -17,6 +17,14 @@ namespace DonateFaith.Domain.Api.Controllers
         {
             _churchService = churchService;
         }
+        protected int GetUserIdFromToken()
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id" || c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                throw new UnauthorizedAccessException("Token inválido ou usuário não autenticado.");
+
+            return int.Parse(userIdClaim.Value);
+        }
 
         // ADMIN e PASTOR
         [HttpGet("pastor/{pastorId}")]
@@ -59,20 +67,20 @@ namespace DonateFaith.Domain.Api.Controllers
         }
 
         // SOMENTE PASTOR pode editar sua própria igreja
-        [HttpPut]
         [Authorize(Roles = "Pastor")]
-        public async Task<IActionResult> Update([FromBody] ChurchDTO dto)
+        [HttpPut]
+        public async Task<IActionResult> UpdateChurch(ChurchDTO dto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var userId = GetUserIdFromToken(); // retorna ID do usuário do token (2006, por exemplo)
 
-            // Valide se a igreja pertence ao pastor
-            var church = await _churchService.GetChurchByPastorIdAsync(dto.Id);
-            if (church == null || church.PastorId != userId)
-                return Forbid();
+            var church = await _churchService.GetChurchByPastorIdAsync(userId);
+            if (church == null || church.Id != dto.Id)
+                return Forbid(); // previne que um pastor atualize igreja de outro
 
             await _churchService.UpdateChurchAsync(dto);
-            return Ok(new { message = "Igreja atualizada com sucesso." });
+            return Ok();
         }
+
 
         // SOMENTE PASTOR pode deletar sua igreja
         [HttpDelete("{id}")]
