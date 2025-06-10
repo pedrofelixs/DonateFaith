@@ -190,6 +190,7 @@ const CadastroIgreja = () => {
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
               required
+              placeholder="Data de Fundação"
             />
             {errors.foundedDate && (
               <p className="text-red-500 text-sm">{errors.foundedDate}</p>

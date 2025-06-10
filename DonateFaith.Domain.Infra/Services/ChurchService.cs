@@ -30,7 +30,8 @@ namespace DonateFaith.Domain.Infra.Services
                 CNPJ = church.CNPJ,
                 Address = church.Address,
                 Phone = church.Phone,
-                FoundedDate = church.FoundedDate
+                FoundedDate = church.FoundedDate,
+                Code = church.Code
             };
         }
 
