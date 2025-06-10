@@ -59,8 +59,7 @@ const AuthPage = () => {
       if (isLogin) {
         localStorage.setItem("token", response.data.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.data.user));
-        const churchId = response.data.data.churchId;
-        router.push(churchId !== 0 ? "/dashboard" : "/licenca");
+        router.push("/codigo");
       } else {
         alert("Cadastro realizado com sucesso!");
         setIsLogin(true);

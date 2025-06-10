@@ -7,10 +7,11 @@ import MobileHeaderLink from "@/components/Layout/Header/Navigation/MobileHeader
 import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role } = useAuth();
 
   const dynamicHeaderData = headerData.map((item) => {
-    if (item.label === "Entrar" && isAuthenticated) {
+    console.log("Header item:", isAuthenticated, role, item.label);
+    if (item.label === "Entrar" && isAuthenticated && role === 1) {
       return { ...item, label: "Dashboard", href: "/dashboard" };
     }
     return item;

@@ -16,6 +16,6 @@ namespace DonateFaith.Domain.DTOs
         public string Address { get; set; }
         public string Phone { get; set; }
         public DateTime FoundedDate { get; set; }
-        public string Code { get; set; }
+    
     }
 }

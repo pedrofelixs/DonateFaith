@@ -31,7 +31,7 @@ namespace DonateFaith.Domain.Infra.Services
                 Address = church.Address,
                 Phone = church.Phone,
                 FoundedDate = church.FoundedDate,
-                Code = church.Code
+                
             };
         }
 
