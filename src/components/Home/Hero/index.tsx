@@ -24,11 +24,17 @@ const Hero = () => {
                             </div>
                         </div>
                         <div className='col-span-12 lg:col-span-6 flex justify-center relative mt-10 lg:mt-0'>
-                            <div className='flex bg-white p-2 gap-5 items-center bottom-10 left-10 rounded-xl absolute'>
+                            <div className='flex bg-white p-2 gap-5 items-center bottom-10 left-10 rounded-xl absolute z-10'>
                                 <Image src={'/Images/Hero/booklet.png'} alt='church-image' width={68} height={68} />
                                 <p className='text-lg font-normal dark:text-black'>Mais recursos para sua missão crescer.</p>
                             </div>
-                            <Image src={'/Images/Hero/Jesus.png'} alt='Jesus' width={400} height={300} />
+                            <Image
+                                src={'/Images/Hero/Jesus.png'}
+                                alt='Jesus'
+                                width={400}
+                                height={300}
+                                className="fade-bottom z-0"
+                            />
                         </div>
                     </div>
                 </div>

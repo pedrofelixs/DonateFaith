@@ -38,18 +38,17 @@ const planos = [
 const LicencasPage = () => {
   const router = useRouter();
 
-  const handleComprar = (tipo: string) => {
+const handleComprar = (tipo: string) => {
   const token = localStorage.getItem("token");
-  console.log(token);
 
   if (token && token !== "undefined" && token !== "null" && token.trim() !== "") {
-    alert(`Licença ${tipo} comprada com sucesso!`);
-    router.push("/cadastrarigreja");
+    router.push(`/formularioPag?plano=${tipo}`);
   } else {
     alert("Você precisa estar logado para comprar uma licença.");
     router.push("/login");
   }
 };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 py-12">
@@ -74,11 +73,12 @@ const LicencasPage = () => {
             </p>
 
             <button
-              onClick={() => handleComprar(plano.nome)}
+              onClick={() => handleComprar(plano.id)} // Aqui usamos o ID
               className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-md transition"
             >
               Comprar {plano.nome}
             </button>
+
           </div>
         ))}
       </div>

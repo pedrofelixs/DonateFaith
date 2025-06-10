@@ -14,7 +14,7 @@ const Cards = ()=> {
                 </div>
                 <div className='grid sm:grid-cols-2 lg:grid-cols-4 gap-y-15 gap-x-5 mt-15'>
                     {FeaturesData.map((items, i) =>(
-                        <div className='p-8 relative rounded-3xl bg-gradient-to-b from-black/5 to-gray-400 dark:from-gray-600 dark:to-gray-800' key={i}>
+                        <div className='p-8 relative rounded-3xl bg-gradient-to-b from-white/5 to-gray-400 dark:from-gray-600 dark:to-gray-800' key={i}>
                             <div className='flex justify-center'>
                                 <img
                                     src={items.imgSrc}
@@ -22,8 +22,8 @@ const Cards = ()=> {
                                     className='w-20 h-20 object-contain'
                                 />
                             </div>
-                            <h3 className='text-2xl text-black dark:text-white font-semibold text-center mt-16'>{items.heading}</h3>
-                            <p className='text-lg font-normal text-black/50 dark:text-white/50 text-center mt-2'>{items.subheading}</p>
+                            <h3 className='text-2xl text-white dark:text-white font-semibold text-center mt-16'>{items.heading}</h3>
+                            <p className='text-lg font-normal text-white/50 dark:text-white/50 text-center mt-2'>{items.subheading}</p>
                             <div className='flex items-center justify-center'>
                                 <Link href='/' className='text-center text-lg group duration-300 ease-in-out font-medium text-primary mt-2 overflow-hidden flex items-center relative after:absolute after:w-full after:h-px after:bg-primary after:bottom-0 after:right-0 after:translate-x-full hover:after:translate-x-0'>
                                     Saiba Mais
@@ -31,7 +31,7 @@ const Cards = ()=> {
                                         icon="tabler:chevron-right"
                                         width="24"
                                         height="24"
-                                        className="text-primary "
+                                        className="text-primary"
                                     />
                                 </Link>
                             </div>
