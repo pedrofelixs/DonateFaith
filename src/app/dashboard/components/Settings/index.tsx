@@ -56,7 +56,7 @@ export default function SettingsTabs() {
         }
       }
     }
-  }, [currentTab]); // Roda toda vez que trocar para tab1
+  }, [currentTab]); 
 
   return (
     <Tabs.Root value={currentTab} onValueChange={setCurrentTab}>

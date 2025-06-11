@@ -18,12 +18,13 @@ export default function Sidebar() {
           title="Doações"
           icon={CheckSquare}
           children={[
-            { label: "Histórico", href: "/dashboard/doacoes/historico" },
+            { label: "Adicionar meta", href: "/dashboard/doacoes/adicionar" },
+            { label: "Gerenciar metas", href: "/dashboard/doacoes/gerenciar" }
           ]}
         />
         <NavItem title="Eventos" icon={BarChart} children={[
             { label: "Criar evento", href: "/dashboard/eventos/cadastrar" },
-            { label: "Histórico", href: "/dashboard/doacoes/historico" },
+            { label: "Gerenciar meus eventos", href: "/dashboard/eventos/gerenciar" },
           ]}/>
         <NavItem title="Membros" icon={Users} children={[
             { label: "Adicionar membros", href: "/dashboard/membros/adicionar" },
@@ -32,7 +33,7 @@ export default function Sidebar() {
 
       <div className="mt-auto flex flex-col gap-6">
         <nav className="space-y-2">
-          <NavItem title="Editar igreja" icon={Cog} href= "/dashboard/"/>
+          <NavItem title="Editar igreja" icon={Cog} href= "/dashboard/editarigreja"/>
         </nav>
       </div>
 

@@ -7,7 +7,6 @@ import { jwtDecode } from 'jwt-decode';
 const CadastrarMembro = () => {
   const router = useRouter();
 
-  // IDs podem ser usados se quiser associar membro à igreja/pastor logado
   const [pastorId, setPastorId] = useState<number | null>(null);
   const [churchId, setChurchId] = useState<number | null>(null);
 
@@ -27,7 +26,6 @@ const CadastrarMembro = () => {
         const id = parseInt(decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]);
         setPastorId(id);
 
-        // Buscar igreja associada ao pastorId
         fetch(`http://localhost:5289/api/church/pastor/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -51,7 +49,18 @@ const CadastrarMembro = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'cpf') {
+      const raw = value.replace(/\D/g, '');
+      const masked = raw
+        .replace(/^(\d{3})(\d)/, '$1.$2')
+        .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+        .replace(/\.(\d{3})(\d)/, '.$1-$2')
+        .slice(0, 14);
+      setFormData(prev => ({ ...prev, cpf: masked }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const validate = () => {
@@ -60,11 +69,12 @@ const CadastrarMembro = () => {
     if (formData.fullName.trim().length < 3) {
       newErrors.fullName = 'Nome completo deve ter ao menos 3 caracteres';
     }
-    // Validação simples para CPF (apenas números e 11 dígitos)
-    if (!/^\d{11}$/.test(formData.cpf)) {
-      newErrors.cpf = 'CPF inválido (deve ter 11 números)';
+
+    const rawCpf = formData.cpf.replace(/\D/g, '');
+    if (rawCpf.length !== 11) {
+      newErrors.cpf = 'CPF inválido (deve conter 11 números)';
     }
-    // Validação simples de email
+
     if (!formData.email.includes('@')) {
       newErrors.email = 'Email inválido';
     }
@@ -86,10 +96,8 @@ const CadastrarMembro = () => {
 
     const payload = {
       fullName: formData.fullName,
-      cpf: formData.cpf,
+      cpf: formData.cpf, 
       email: formData.email,
-      // Se quiser associar churchId, pode enviar aqui, se API permitir
-      // churchId: churchId,
     };
 
     try {
@@ -105,7 +113,7 @@ const CadastrarMembro = () => {
       if (!res.ok) throw new Error('Erro ao cadastrar membro');
 
       alert('Membro cadastrado com sucesso!');
-      router.push('/'); // Ou outra rota que desejar após cadastro
+      router.push('/');
     } catch (error) {
       alert('Erro ao enviar os dados');
       console.error(error);
@@ -137,10 +145,9 @@ const CadastrarMembro = () => {
             <input
               type="text"
               name="cpf"
-              placeholder="CPF (somente números)"
+              placeholder="CPF"
               value={formData.cpf}
               onChange={handleChange}
-              maxLength={11}
               className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
               required
             />

@@ -2,21 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
-const CadastrarEvento = () => {
+const CriarMetaDoacao = () => {
   const router = useRouter();
 
   const [pastorId, setPastorId] = useState<number | null>(null);
-   const [churchId, setChurchId] = useState<number | null>(null);
+  const [churchId, setChurchId] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    startDate: '',
-    endDate: '',
-    location: '',
-    maxNumber: '',
+    goalsAmount: '',
+    amount: '',
+    date: '',
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -24,31 +23,30 @@ const CadastrarEvento = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-       try {
-      const decoded: any = jwtDecode(token);
-      const id = parseInt(decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]);
-      setPastorId(id);
+      try {
+        const decoded: any = jwtDecode(token);
+        const id = parseInt(decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]);
+        setPastorId(id);
 
-      // Buscar igreja associada ao pastorId
-      fetch(`http://localhost:5289/api/church/pastor/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then(res => {
-          if (!res.ok) throw new Error('Erro ao buscar igreja');
-          return res.json();
+        fetch(`http://localhost:5289/api/church/pastor/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         })
-        .then(data => {
-          setChurchId(data.id); // supondo que o retorno tem campo id da igreja
-        })
-        .catch(err => {
-          console.error('Erro ao buscar igreja:', err);
-        });
-    } catch (err) {
-      console.error('Erro ao decodificar token:', err);
+          .then(res => {
+            if (!res.ok) throw new Error('Erro ao buscar igreja');
+            return res.json();
+          })
+          .then(data => {
+            setChurchId(data.id);
+          })
+          .catch(err => {
+            console.error('Erro ao buscar igreja:', err);
+          });
+      } catch (err) {
+        console.error('Erro ao decodificar token:', err);
+      }
     }
-  }
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -60,31 +58,23 @@ const CadastrarEvento = () => {
     const newErrors: { [key: string]: string } = {};
 
     if (formData.name.trim().length < 3) {
-      newErrors.name = 'Nome do evento muito curto';
+      newErrors.name = 'Nome da meta muito curto';
     }
 
     if (formData.description.trim().length < 10) {
       newErrors.description = 'Descrição muito curta';
     }
 
-    if (!formData.startDate) {
-      newErrors.startDate = 'Data de início obrigatória';
+    if (!formData.date) {
+      newErrors.date = 'Data obrigatória';
     }
 
-    if (!formData.endDate) {
-      newErrors.endDate = 'Data de fim obrigatória';
+    if (!formData.goalsAmount || isNaN(Number(formData.goalsAmount)) || Number(formData.goalsAmount) <= 0) {
+      newErrors.goalsAmount = 'Valor da meta inválido';
     }
 
-    if (formData.startDate && formData.endDate && formData.endDate < formData.startDate) {
-      newErrors.endDate = 'Data de fim deve ser após a data de início';
-    }
-
-    if (formData.location.trim().length < 3) {
-      newErrors.location = 'Local inválido';
-    }
-
-    if (!formData.maxNumber || isNaN(Number(formData.maxNumber)) || Number(formData.maxNumber) <= 0) {
-      newErrors.maxNumber = 'Informe um número válido de participantes';
+    if (!formData.amount || isNaN(Number(formData.amount)) || Number(formData.amount) < 0) {
+      newErrors.amount = 'Valor arrecadado inválido';
     }
 
     setErrors(newErrors);
@@ -96,8 +86,8 @@ const CadastrarEvento = () => {
 
     if (!validate()) return;
 
-    if (!pastorId) {
-      alert('Não foi possível identificar o pastor logado. Faça login novamente.');
+    if (!pastorId || !churchId) {
+      alert('Não foi possível identificar o usuário. Faça login novamente.');
       return;
     }
 
@@ -108,18 +98,17 @@ const CadastrarEvento = () => {
     }
 
     const payload = {
-      organizerId: pastorId, // pastorId extraído do token
+      userId: pastorId,
+      churchId: churchId,
       name: formData.name,
-      churchId: churchId, // ajuste se quiser pegar essa info do usuário
       description: formData.description,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-      location: formData.location,
-      maxNumber: Number(formData.maxNumber),
+      goalsAmount: Number(formData.goalsAmount),
+      amount: Number(formData.amount),
+      date: formData.date,
     };
 
     try {
-      const res = await fetch('http://localhost:5289/api/Event', {
+      const res = await fetch('http://localhost:5289/api/Donation', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -128,10 +117,10 @@ const CadastrarEvento = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error('Erro ao cadastrar evento');
+      if (!res.ok) throw new Error('Erro ao criar meta de doação');
 
-      alert('Evento cadastrado com sucesso!');
-      router.push('/dashboard/eventos/gerenciar');
+      alert('Meta de doação criada com sucesso!');
+      router.push('/');
     } catch (error) {
       alert('Erro ao enviar os dados');
       console.error(error);
@@ -142,14 +131,14 @@ const CadastrarEvento = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 px-4">
       <div className="w-full max-w-xl p-8 bg-white dark:bg-gray-800 rounded-xl shadow-xl">
         <h2 className="text-3xl font-semibold text-center text-gray-900 dark:text-white mb-6">
-          Cadastrar Novo Evento
+          Criar Meta de Doação
         </h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <input
               type="text"
               name="name"
-              placeholder="Nome do Evento"
+              placeholder="Nome da Meta"
               value={formData.name}
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
@@ -170,58 +159,49 @@ const CadastrarEvento = () => {
             {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
           </div>
 
-          <div className="flex space-x-2">
-            <input
-              placeholder="Data de Começo"
-              type="date"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
-              required
-            />
-            <input
-              placeholder="Data de Fim"
-              type="date"
-              name="endDate"
-              value={formData.endDate}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
-              required
-            />
-          </div>
-
           <div>
             <input
-              type="text"
-              name="location"
-              placeholder="Local do Evento"
-              value={formData.location}
+              type="datetime-local"
+              name="date"
+              value={formData.date}
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
               required
             />
-            {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
+            {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
           </div>
 
           <div>
             <input
               type="number"
-              name="maxNumber"
-              placeholder="Máximo de Participantes"
-              value={formData.maxNumber}
+              name="goalsAmount"
+              placeholder="Valor da Meta (R$)"
+              value={formData.goalsAmount}
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
               required
             />
-            {errors.maxNumber && <p className="text-red-500 text-sm">{errors.maxNumber}</p>}
+            {errors.goalsAmount && <p className="text-red-500 text-sm">{errors.goalsAmount}</p>}
+          </div>
+
+          <div>
+            <input
+              type="number"
+              name="amount"
+              placeholder="Valor Inicial Arrecadado (R$)"
+              value={formData.amount}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+              required
+            />
+            {errors.amount && <p className="text-red-500 text-sm">{errors.amount}</p>}
           </div>
 
           <button
             type="submit"
             className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-md transition"
           >
-            Cadastrar Evento
+            Criar Meta
           </button>
         </form>
       </div>
@@ -229,4 +209,4 @@ const CadastrarEvento = () => {
   );
 };
 
-export default CadastrarEvento;
+export default CriarMetaDoacao;

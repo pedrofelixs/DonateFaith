@@ -3,34 +3,34 @@
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
-interface Event {
+interface Donation {
   id: number;
   name: string;
+  goalsAmount: number;
+  amount: number;
+  date: string;
   description: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-  maxNumber: number;
+  userId: number;
   churchId: number;
-  organizerId: number;
+  parentDonationId: number | null;
 }
 
 interface Church {
-  code: string;
   id: number;
+  code: string;
   name: string;
 }
 
-const Eventos = () => {
-  const [events, setEvents] = useState<Event[]>([]);
+const Doacoes = () => {
+  const [donations, setDonations] = useState<Donation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editDonation, setEditDonation] = useState<Donation | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [editEvent, setEditEvent] = useState<Event | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      setError('Token não encontrado. Faça login novamente.');
+      setError('Token não encontrado.');
       setLoading(false);
       return;
     }
@@ -45,111 +45,108 @@ const Eventos = () => {
     })
       .then((res) => res.json())
       .then((church: Church) =>
-        fetch(`http://localhost:5289/api/Event/by-church-code/${church.code}`, {
+        fetch(`http://localhost:5289/api/Donation/by-church-code/${church.code}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
       )
       .then((res) => res.json())
-      .then((data: Event[]) => {
-        setEvents(data);
+      .then((data: Donation[]) => {
+        const metas = data.filter((d) => d.parentDonationId === null);
+        setDonations(metas);
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message);
+        setError('Erro ao buscar metas.');
         setLoading(false);
       });
   }, []);
 
   const handleDelete = async (id: number) => {
-    const confirm = window.confirm('Tem certeza que deseja deletar este evento?');
+    const confirm = window.confirm('Deseja excluir esta meta?');
     if (!confirm) return;
 
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://localhost:5289/api/Event/${id}`, {
+      const res = await fetch(`http://localhost:5289/api/Donation/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) throw new Error('Erro ao deletar evento');
+      if (!res.ok) throw new Error();
 
-      setEvents((prev) => prev.filter((e) => e.id !== id));
-    } catch (err) {
-      alert('Erro ao deletar evento');
-      console.error(err);
+      setDonations((prev) => prev.filter((d) => d.id !== id));
+    } catch {
+      alert('Erro ao deletar meta.');
     }
   };
 
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!editEvent) return;
+    if (!editDonation) return;
     const { name, value } = e.target;
-    setEditEvent({ ...editEvent, [name]: value });
+    setEditDonation({ ...editDonation, [name]: name === 'goalsAmount' || name === 'amount' ? +value : value });
   };
 
   const handleUpdate = async () => {
     const token = localStorage.getItem('token');
-    if (!editEvent) return;
+    if (!editDonation) return;
 
     try {
-      const res = await fetch('http://localhost:5289/api/Event', {
+      const res = await fetch('http://localhost:5289/api/Donation', {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editEvent),
+        body: JSON.stringify(editDonation),
       });
 
-      if (!res.ok) throw new Error('Erro ao atualizar evento');
+      if (!res.ok) throw new Error();
 
-      alert('Evento atualizado com sucesso!');
-      setEvents((prev) =>
-        prev.map((e) => (e.id === editEvent.id ? { ...editEvent } : e))
+      alert('Meta atualizada com sucesso!');
+      setDonations((prev) =>
+        prev.map((d) => (d.id === editDonation.id ? { ...editDonation } : d))
       );
-      setEditEvent(null);
-    } catch (err) {
-      alert('Erro ao atualizar evento');
-      console.error(err);
+      setEditDonation(null);
+    } catch {
+      alert('Erro ao atualizar meta.');
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Carregando eventos...</p>;
+  if (loading) return <p className="text-center mt-10">Carregando metas...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="min-h-screen px-4 py-10 bg-gray-100 dark:bg-gray-900">
       <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">
-        Eventos da Igreja
+        Metas de Doações da Igreja
       </h1>
 
-      {events.length === 0 ? (
-        <p className="text-center text-gray-600 dark:text-gray-300">Nenhum evento encontrado.</p>
+      {donations.length === 0 ? (
+        <p className="text-center text-gray-600 dark:text-gray-300">Nenhuma meta encontrada.</p>
       ) : (
         <div className="grid gap-6 max-w-4xl mx-auto">
-          {events.map((event) => (
+          {donations.map((donation) => (
             <div
-              key={event.id}
+              key={donation.id}
               className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md space-y-2"
             >
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{event.name}</h2>
-              <p className="text-gray-600 dark:text-gray-300">{event.description}</p>
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{donation.name}</h2>
+              <p className="text-gray-600 dark:text-gray-300">{donation.description}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {new Date(event.startDate).toLocaleDateString()} -{' '}
-                {new Date(event.endDate).toLocaleDateString()}
+                Arrecadado: R$ {donation.amount} / Meta: R$ {donation.goalsAmount}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Local: {event.location}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Máximo: {event.maxNumber}
+                Data: {new Date(donation.date).toLocaleDateString()}
               </p>
               <div className="flex gap-4 pt-2">
                 <button
-                  onClick={() => setEditEvent(event)}
+                  onClick={() => setEditDonation(donation)}
                   className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md"
                 >
                   Editar
                 </button>
                 <button
-                  onClick={() => handleDelete(event.id)}
+                  onClick={() => handleDelete(donation.id)}
                   className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md"
                 >
                   Deletar
@@ -160,60 +157,52 @@ const Eventos = () => {
         </div>
       )}
 
-      {editEvent && (
+      {editDonation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-full max-w-lg space-y-4">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Editar Evento</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Editar Meta</h2>
             <input
               name="name"
-              value={editEvent.name}
+              value={editDonation.name}
               onChange={handleEditChange}
               className="w-full px-4 py-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
               placeholder="Nome"
             />
             <textarea
               name="description"
-              value={editEvent.description}
+              value={editDonation.description}
               onChange={handleEditChange}
               className="w-full px-4 py-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
               placeholder="Descrição"
             />
             <input
-              name="location"
-              value={editEvent.location}
-              onChange={handleEditChange}
-              className="w-full px-4 py-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
-              placeholder="Local"
-            />
-            <input
-              name="startDate"
-              type="date"
-              value={editEvent.startDate.split('T')[0]}
-              onChange={(e) =>
-                setEditEvent({ ...editEvent, startDate: `${e.target.value}T00:00:00` })
-              }
-              className="w-full px-4 py-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
-            />
-            <input
-              name="endDate"
-              type="date"
-              value={editEvent.endDate.split('T')[0]}
-              onChange={(e) =>
-                setEditEvent({ ...editEvent, endDate: `${e.target.value}T00:00:00` })
-              }
-              className="w-full px-4 py-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
-            />
-            <input
-              name="maxNumber"
+              name="goalsAmount"
               type="number"
-              value={editEvent.maxNumber}
+              value={editDonation.goalsAmount}
               onChange={handleEditChange}
               className="w-full px-4 py-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
-              placeholder="Máximo de participantes"
+              placeholder="Valor da Meta"
+            />
+            <input
+              name="amount"
+              type="number"
+              value={editDonation.amount}
+              onChange={handleEditChange}
+              className="w-full px-4 py-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+              placeholder="Arrecadado"
+            />
+            <input
+              name="date"
+              type="date"
+              value={editDonation.date.split('T')[0]}
+              onChange={(e) =>
+                setEditDonation({ ...editDonation, date: `${e.target.value}T00:00:00` })
+              }
+              className="w-full px-4 py-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
             />
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setEditEvent(null)}
+                onClick={() => setEditDonation(null)}
                 className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md"
               >
                 Cancelar
@@ -232,4 +221,4 @@ const Eventos = () => {
   );
 };
 
-export default Eventos;
+export default Doacoes;
