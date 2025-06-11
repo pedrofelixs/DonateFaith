@@ -1,0 +1,173 @@
+CREATE DATABASE DonateFaith;
+GO
+
+USE DonateFaith;
+GO
+
+-- Tabela Churches
+CREATE TABLE Churches (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Code NVARCHAR(MAX) NULL,
+    CNPJ NVARCHAR(18) NOT NULL,
+    Address NVARCHAR(200) NOT NULL,
+    Phone NVARCHAR(20) NOT NULL,
+    FoundedDate DATETIME2 NOT NULL,
+    PastorId INT NULL
+);
+GO
+
+-- Tabela Transactions
+CREATE TABLE Transactions (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ChurchId INT NOT NULL,
+    Type INT NOT NULL,
+    Amount DECIMAL(18,2) NOT NULL,
+    TransactionDate DATETIME2 NOT NULL,
+    Description NVARCHAR(255) NOT NULL,
+    CONSTRAINT FK_Transactions_Churches FOREIGN KEY (ChurchId) REFERENCES Churches(Id) ON DELETE CASCADE
+);
+GO
+
+-- Tabela Users (ChurchId é NULLABLE agora)
+CREATE TABLE Users (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    FullName NVARCHAR(150) NOT NULL,
+    CPF NVARCHAR(MAX) NOT NULL,
+    Email NVARCHAR(100) NOT NULL,
+    PasswordHash NVARCHAR(MAX) NOT NULL,
+    Role INT NOT NULL,
+    ChurchId INT NULL,
+    ChurchCode NVARCHAR(MAX) NULL
+);
+GO
+
+-- Adiciona FK de PastorId referenciando apenas Users.Id (não composta)
+ALTER TABLE Churches
+ADD CONSTRAINT FK_Churches_PastorId FOREIGN KEY (PastorId) REFERENCES Users(Id);
+GO
+
+-- Índice composto para performance da FK acima
+CREATE INDEX IX_Users_Id_ChurchId ON Users(Id, ChurchId);
+GO
+
+-- AdminChurches
+CREATE TABLE AdminChurches (
+    AdminId INT NOT NULL,
+    ChurchId INT NOT NULL,
+    CONSTRAINT PK_AdminChurches PRIMARY KEY (AdminId, ChurchId),
+    CONSTRAINT FK_AdminChurches_Users FOREIGN KEY (AdminId) REFERENCES Users(Id) ON DELETE NO ACTION,
+    CONSTRAINT FK_AdminChurches_Churches FOREIGN KEY (ChurchId) REFERENCES Churches(Id) ON DELETE CASCADE
+);
+GO
+
+-- Donations (TransactionId, DonorName, DonorEmail agora aceitam NULL)
+CREATE TABLE Donations (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ChurchId INT NOT NULL,
+    Description NVARCHAR(500) NOT NULL,
+    Name NVARCHAR(100) NOT NULL,
+    DonorName NVARCHAR(100) NULL,
+    DonorEmail NVARCHAR(100) NULL,
+    GoalsAmount DECIMAL(18,2) NOT NULL,
+    Amount DECIMAL(18,2) NOT NULL,
+    PaymentMethod INT NOT NULL,
+    DonationDate DATETIME2 NOT NULL,
+    TransactionId INT NULL,
+    UserId INT NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    DonationId INT NULL,
+    CONSTRAINT FK_Donations_Churches FOREIGN KEY (ChurchId) REFERENCES Churches(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_Donations_Donations FOREIGN KEY (DonationId) REFERENCES Donations(Id),
+    CONSTRAINT FK_Donations_Transactions FOREIGN KEY (TransactionId) REFERENCES Transactions(Id),
+    CONSTRAINT FK_Donations_Users FOREIGN KEY (UserId) REFERENCES Users(Id)
+);
+GO
+
+-- Events
+CREATE TABLE Events (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ChurchId INT NOT NULL,
+    Name NVARCHAR(100) NOT NULL,
+    Date DATETIME2 NOT NULL,
+    EndDate DATETIME2 NOT NULL,
+    Location NVARCHAR(200) NOT NULL,
+    Description NVARCHAR(500) NOT NULL,
+    OrganizerId INT NOT NULL,
+    MaxParticipants INT NOT NULL,
+    IsRegistrationOpen BIT NOT NULL,
+    CONSTRAINT FK_Events_Churches FOREIGN KEY (ChurchId) REFERENCES Churches(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_Events_Users FOREIGN KEY (OrganizerId) REFERENCES Users(Id)
+);
+GO
+
+-- FinancialReports
+CREATE TABLE FinancialReports (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ChurchId INT NOT NULL,
+    TreasurerId INT NOT NULL,
+    Period DATETIME2 NOT NULL,
+    InitialBalance DECIMAL(18,2) NOT NULL,
+    TotalIncome DECIMAL(18,2) NOT NULL,
+    TotalExpenses DECIMAL(18,2) NOT NULL,
+    FinalBalance DECIMAL(18,2) NOT NULL,
+    ReportFileUrl NVARCHAR(300) NOT NULL,
+    CONSTRAINT FK_FinancialReports_Churches FOREIGN KEY (ChurchId) REFERENCES Churches(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_FinancialReports_Users FOREIGN KEY (TreasurerId) REFERENCES Users(Id)
+);
+GO
+
+-- Posts
+CREATE TABLE Posts (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ChurchId INT NOT NULL,
+    Title NVARCHAR(200) NOT NULL,
+    Content NVARCHAR(MAX) NOT NULL,
+    AuthorId INT NOT NULL,
+    PublishedDate DATETIME2 NOT NULL,
+    ImageUrl NVARCHAR(300) NULL,
+    CONSTRAINT FK_Posts_Churches FOREIGN KEY (ChurchId) REFERENCES Churches(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_Posts_Users FOREIGN KEY (AuthorId) REFERENCES Users(Id)
+);
+GO
+
+-- Tithes
+CREATE TABLE Tithes (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    MemberId INT NOT NULL,
+    ChurchId INT NOT NULL,
+    Amount DECIMAL(18,2) NOT NULL,
+    Date DATETIME2 NOT NULL,
+    TransactionId INT NOT NULL,
+    TitheDate DATETIME2 NOT NULL,
+    TitheId INT NULL,
+    CONSTRAINT FK_Tithes_Churches FOREIGN KEY (ChurchId) REFERENCES Churches(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_Tithes_Tithes FOREIGN KEY (TitheId) REFERENCES Tithes(Id),
+    CONSTRAINT FK_Tithes_Transactions FOREIGN KEY (TransactionId) REFERENCES Transactions(Id),
+    CONSTRAINT FK_Tithes_Users_Member FOREIGN KEY (MemberId) REFERENCES Users(Id),
+    CONSTRAINT FK_Tithes_Users_User FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE NO ACTION
+);
+GO
+
+-- Índices
+CREATE INDEX IX_AdminChurches_ChurchId ON AdminChurches(ChurchId);
+CREATE INDEX IX_Donations_ChurchId ON Donations(ChurchId);
+CREATE INDEX IX_Donations_DonationId ON Donations(DonationId);
+CREATE INDEX IX_Donations_TransactionId ON Donations(TransactionId);
+CREATE INDEX IX_Donations_UserId ON Donations(UserId);
+CREATE INDEX IX_Events_ChurchId ON Events(ChurchId);
+CREATE INDEX IX_Events_OrganizerId ON Events(OrganizerId);
+CREATE INDEX IX_FinancialReports_ChurchId ON FinancialReports(ChurchId);
+CREATE INDEX IX_FinancialReports_TreasurerId ON FinancialReports(TreasurerId);
+CREATE INDEX IX_Posts_ChurchId ON Posts(ChurchId);
+CREATE INDEX IX_Posts_AuthorId ON Posts(AuthorId);
+CREATE INDEX IX_Tithes_ChurchId ON Tithes(ChurchId);
+CREATE INDEX IX_Tithes_TitheId ON Tithes(TitheId);
+CREATE INDEX IX_Tithes_TransactionId ON Tithes(TransactionId);
+CREATE INDEX IX_Tithes_MemberId ON Tithes(MemberId);
+CREATE INDEX IX_Tithes_UserId ON Tithes(UserId);
+CREATE INDEX IX_Transactions_ChurchId ON Transactions(ChurchId);
+CREATE INDEX IX_Users_ChurchId ON Users(ChurchId);
+GO

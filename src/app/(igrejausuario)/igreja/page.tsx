@@ -75,7 +75,9 @@ const IgrejaPage = () => {
         }));
         setEvents(mappedEvents);
 
-        const mappedDonations = donationsRes.data.map((d: any) => ({
+        const mappedDonations = donationsRes.data
+        .filter((d: any) => d.parentDonationId === null)
+        .map((d: any) => ({
           id: d.id,
           name: d.name,
           amount: d.amount,
@@ -162,7 +164,7 @@ const IgrejaPage = () => {
                     </p>
                     <button
                       className="mt-2 py-2 px-4 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                      onClick={() => alert(`Doar para a campanha: ${donation.name}`)}
+                      onClick={() => router.push(`/doar?code=${code}&id=${donation.id}`)}
                     >
                       Doar
                     </button>

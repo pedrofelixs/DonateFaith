@@ -35,7 +35,7 @@ namespace DonateFaith.Domain.Models
 
         [ForeignKey(nameof(TransactionId))]
         public Transaction? Transaction { get; set; }
-        public int? ParentDonationId { get; internal set; }
+        public int? ParentDonationId { get; set; }
     }
 
 }
