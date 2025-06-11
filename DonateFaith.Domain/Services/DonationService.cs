@@ -41,14 +41,24 @@ public class DonationService : IDonationService
         {
             Name = dto.Name,
             GoalsAmount = dto.GoalsAmount,
-            CreatedAt = dto.CreatedAt,
+            CreatedAt = dto.Date,
+            Description = dto.Description,
             Amount = dto.Amount,
             DonationDate = DateTime.UtcNow,
             UserId = dto.UserId,
-            ChurchId = dto.ChurchId
+            ChurchId = dto.ChurchId,
+            ParentDonationId = dto.ParentDonationId // 👈 Adicionado
         };
+
         await _donationRepository.AddAsync(donation);
     }
+    public async Task<IEnumerable<DonationDTO>> GetDonationsByCampaignIdAsync(int campaignId)
+    {
+        var donations = await _donationRepository.GetDonationsByParentIdAsync(campaignId);
+        return donations.Select(ToDto);
+    }
+
+
 
     public async Task CreateDonationAsync(DonationDTO dto)
     {
@@ -56,7 +66,7 @@ public class DonationService : IDonationService
         {
             Name = dto.Name,
             GoalsAmount = dto.GoalsAmount,
-            CreatedAt = dto.CreatedAt,
+            CreatedAt = dto.Date,
             Description = dto.Description,
             Amount = dto.Amount,
             DonationDate = DateTime.UtcNow,

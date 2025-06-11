@@ -20,8 +20,8 @@ namespace DonateFaith.Domain.Models
 
         public string? DonorName { get; set; }
         public string? DonorEmail { get; set; }
-        public decimal GoalsAmount { get; set; }
-        public decimal Amount { get; set; }
+        public decimal? GoalsAmount { get; set; }
+        public decimal? Amount { get; set; }
 
         public PaymentMethod PaymentMethod { get; set; }
 
@@ -35,6 +35,7 @@ namespace DonateFaith.Domain.Models
 
         [ForeignKey(nameof(TransactionId))]
         public Transaction? Transaction { get; set; }
+        public int? ParentDonationId { get; internal set; }
     }
 
 }

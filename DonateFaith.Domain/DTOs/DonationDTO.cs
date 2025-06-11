@@ -10,12 +10,13 @@ namespace DonateFaith.Domain.DTOs
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public decimal Amount { get; set; }
-        public decimal GoalsAmount { get; set; }
+        public decimal? GoalsAmount { get; set; }
+        public decimal? Amount { get; set; }
         public DateTime Date { get; set; }
         public string Description { get; set; }
         public int UserId { get; set; }
         public int ChurchId { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public int? ParentDonationId { get; set; } // 👈 Adicionado
     }
+
 }

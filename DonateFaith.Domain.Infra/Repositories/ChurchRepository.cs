@@ -1,4 +1,5 @@
 ﻿using DonateFaith.Domain.Infra.Data;
+using DonateFaith.Domain.Interfaces;
 using DonateFaith.Domain.Models;
 using DonateFaith.Domain.Models.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DonateFaith.Domain.Infra.Repositories
 {
-    public class ChurchRepository
+    public class ChurchRepository : IChurchRepository
     {
         private readonly AppDbContext _context;
 

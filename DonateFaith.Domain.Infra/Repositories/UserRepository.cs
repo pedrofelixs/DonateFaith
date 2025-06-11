@@ -23,7 +23,21 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetByEmailAsync(string email)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+        Console.WriteLine($"email buscado: [{email}]");
+        var user = await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+        if (user == null)
+        {
+            Console.WriteLine("Usuário não encontrado via LINQ.");
+        }
+        else
+        {
+            Console.WriteLine("Usuário encontrado!");
+        }
+
         if (user == null)
         {
             // Retorno seguro para evitar erros

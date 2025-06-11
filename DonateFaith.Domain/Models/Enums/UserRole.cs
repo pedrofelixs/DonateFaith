@@ -4,7 +4,8 @@ namespace DonateFaith.Domain.Models.Enums
     {
         Admin,
         Pastor,
-        Member
+        Member,
+        Donor
     }
 
 }

@@ -48,19 +48,32 @@ namespace DonateFaith.Domain.Infra.Services
         public async Task RegisterAsync(RegisterUserDTO dto)
         {
             var existing = await _userRepository.GetByEmailAsync(dto.Email);
-            if (existing != null)
-                throw new Exception("Email already registered.");
 
-            var user = new User
+            if (existing == null)
             {
-                FullName = dto.FullName,
-                Email = dto.Email,
-                CPF = dto.CPF,
-                Role = dto.Role, // Por padrão (ou user comum se preferir)
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
-            };
+                // Usuário não existe → criar novo
+                var user = new User
+                {
+                    FullName = dto.FullName,
+                    Email = dto.Email,
+                    CPF = dto.CPF,
+                    Role = dto.Role, // ou UserRole.Member, se preferir forçar
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
+                };
+                await _userRepository.AddAsync(user);
+            }
+            else if (existing.Role == UserRole.Member)
+            {
+                // Usuário já existe e é um membro → atualizar a senha
+                existing.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+                await _userRepository.UpdateAsync(existing);
+            }
+            else
+            {
+                // Usuário já existe, mas não é um membro → lançar exceção
+                throw new Exception("Email já cadastrado e pertence a outro perfil.");
+            }
 
-            await _userRepository.AddAsync(user);
         }
 
         private string GenerateJwtToken(User user)

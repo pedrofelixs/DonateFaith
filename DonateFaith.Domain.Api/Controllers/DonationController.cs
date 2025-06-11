@@ -2,6 +2,7 @@
 using DonateFaith.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Filters;
 using System.Security.Claims;
 
 namespace DonateFaith.Domain.Api.Controllers
@@ -44,6 +45,10 @@ namespace DonateFaith.Domain.Api.Controllers
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             dto.UserId = userId;
 
+            // Garantir que ParentDonationId está presente para associar à campanha
+            if (dto.ParentDonationId == null)
+                return BadRequest("A doação deve estar associada a uma campanha.");
+
             await _donationService.AddDonationAsync(dto);
             return Ok(new { message = "Doação realizada com sucesso!" });
         }
@@ -56,11 +61,29 @@ namespace DonateFaith.Domain.Api.Controllers
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             dto.UserId = userId;
 
+            // Campanha não deve ter ParentDonationId
+            dto.ParentDonationId = null;
+
             await _donationService.CreateDonationAsync(dto);
             return Ok(new { message = "Campanha de doação criada com sucesso!" });
         }
 
-        // 🔐 PUT para editar doação — apenas Pastor
+        [HttpGet("by-church-code/{churchCode}")]
+        [Authorize(Roles = "Pastor")]
+        public async Task<IActionResult> GetDonationsByChurchCode(string churchCode)
+        {
+            var donations = await _donationService.GetDonationsByChurchCodeAsync(churchCode);
+            return Ok(donations);
+        }
+
+        [HttpGet("campaign/{campaignId}/donations")]
+        [Authorize(Roles = "Pastor")]
+        public async Task<IActionResult> GetDonationsOfCampaign(int campaignId)
+        {
+            var donations = await _donationService.GetDonationsByCampaignIdAsync(campaignId);
+            return Ok(donations);
+        }
+
         [HttpPut]
         [Authorize(Roles = "Pastor")]
         public async Task<IActionResult> Update([FromBody] DonationDTO dto)
@@ -74,8 +97,6 @@ namespace DonateFaith.Domain.Api.Controllers
             await _donationService.UpdateDonationAsync(dto);
             return Ok(new { message = "Doação atualizada com sucesso!" });
         }
-
-        // 🔐 DELETE — apenas Pastor
         [HttpDelete("{id}")]
         [Authorize(Roles = "Pastor")]
         public async Task<IActionResult> Delete(int id)

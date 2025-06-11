@@ -39,6 +39,13 @@ public class DonationRepository : IDonationRepository
         .ToListAsync();
 
     }
+    public async Task<IEnumerable<Donation>> GetDonationsByParentIdAsync(int parentDonationId)
+    {
+        return await _context.Donations
+            .Where(d => d.ParentDonationId == parentDonationId)
+            .ToListAsync();
+    }
+
 
     public async Task<Donation> GetOnlyDonationAsync()
     {

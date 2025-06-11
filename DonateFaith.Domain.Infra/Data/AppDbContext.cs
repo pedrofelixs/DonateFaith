@@ -73,12 +73,6 @@ namespace DonateFaith.Domain.Infra.Data
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // 🔗 Tithe.Member (1:1 ou N:1)
-            modelBuilder.Entity<Tithe>()
-                .HasOne(t => t.Member)
-                .WithMany() // sem navegação reversa
-                .HasForeignKey(t => t.MemberId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             // 🔗 Tithe.Church
             modelBuilder.Entity<Tithe>()

@@ -62,7 +62,7 @@ namespace DonateFaith.Domain.Services
                 existingUser.ChurchId = pastor.ChurchId;
                 existingUser.FullName = dto.FullName;
                 existingUser.Name = dto.FullName.Split(' ')[0];
-                existingUser.Email ??= dto.Email;
+                existingUser.Email = dto.Email;
 
                 await _userRepository.UpdateAsync(existingUser);
             }

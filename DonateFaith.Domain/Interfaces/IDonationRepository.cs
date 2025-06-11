@@ -14,6 +14,7 @@ namespace DonateFaith.Domain.Interfaces
         Task<Donation> GetByIdAsync(int id);
         Task<IEnumerable<Donation>> GetByChurchCodeAsync(string churchCode); // <-- NOVO
         Task<Donation> GetOnlyDonationAsync(); // <-- NOVO
+        Task<IEnumerable<Donation>> GetDonationsByParentIdAsync(int parentDonationId);
 
         Task AddAsync(Donation donation);
         Task UpdateAsync(Donation donation);

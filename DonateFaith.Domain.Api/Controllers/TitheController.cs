@@ -1,7 +1,8 @@
 ﻿using DonateFaith.Domain.DTOs;
+using DonateFaith.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DonateFaith.Domain.Interfaces;
+using System.Security.Claims;
 
 namespace DonateFaith.Domain.Api.Controllers
 {
@@ -16,37 +17,33 @@ namespace DonateFaith.Domain.Api.Controllers
             _service = service;
         }
 
+        // Registrar dízimo
         [HttpPost("give")]
-        [Authorize(Roles = "Member")]
+        [Authorize(Roles = "Member, Pastor")]
         public async Task<IActionResult> GiveTithe([FromBody] TitheDTO dto)
         {
             await _service.AddAsync(dto);
             return Ok(new { message = "Dízimo registrado com sucesso." });
         }
 
-        [HttpGet("user/{userId}")]
-        [Authorize(Roles = "Member,Pastor")]
-        public async Task<IActionResult> GetUserTithes(int userId)
-        {
-            var tithes = await _service.GetByUserIdAsync(userId);
-            return Ok(tithes);
-        }
-
-        [HttpGet]
+        // Ver todos os dízimos (para o pastor)
+        [HttpGet("all")]
         [Authorize(Roles = "Pastor")]
-        public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetAllTithes(int page = 1, int pageSize = 10)
         {
             var result = await _service.GetAllAsync(page, pageSize);
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Pastor")]
-        public async Task<IActionResult> Delete(int id)
+        // Ver dízimos por membro (para o membro ou pastor)
+        [HttpGet("user/{userId}")]
+        [Authorize(Roles = "Member, Pastor")]
+        public async Task<IActionResult> GetUserTithes(int userId)
         {
-            await _service.DeleteAsync(id);
-            return Ok();
+            var result = await _service.GetByUserIdAsync(userId);
+            return Ok(result);
         }
-    }
 
+
+    }
 }

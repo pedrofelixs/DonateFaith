@@ -3,10 +3,8 @@ using DonateFaith.Domain.Infra.Data;
 using DonateFaith.Domain.Interfaces;
 using DonateFaith.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DonateFaith.Domain.Infra.Repositories
@@ -59,6 +57,21 @@ namespace DonateFaith.Domain.Infra.Repositories
                 .Where(t => t.UserId == userId)
                 .ToListAsync();
         }
-    }
 
+        // 🔄 NOVO: Buscar dízimos por campanha
+        public async Task<IEnumerable<Tithe>> GetByCampaignIdAsync(int campaignId)
+        {
+            return await _context.Tithes
+                .Where(t => t.CampaignId == campaignId)
+                .ToListAsync();
+        }
+
+        // 🔄 NOVO: Buscar campanhas por ChurchId (amount = 0 = campanha)
+        public async Task<IEnumerable<Tithe>> GetCampaignsByChurchIdAsync(int churchId)
+        {
+            return await _context.Tithes
+                .Where(t => t.ChurchId == churchId && t.CampaignId == null)
+                .ToListAsync();
+        }
+    }
 }

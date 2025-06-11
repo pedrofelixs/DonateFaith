@@ -1,4 +1,4 @@
-using DonateFaith.Domain.Infra.Data;
+﻿using DonateFaith.Domain.Infra.Data;
 using DonateFaith.Domain.Infra.Repositories;
 using DonateFaith.Domain.Infra.Services;
 using DonateFaith.Domain.Interfaces;
@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 
@@ -27,6 +29,7 @@ builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IDonationRepository, DonationRepository>();
 builder.Services.AddScoped<ITitheRepository, TitheRepository>();
+builder.Services.AddScoped<IChurchRepository, ChurchRepository>();
 builder.Services.AddScoped<AuthService>();
 
 // Services
@@ -36,6 +39,7 @@ builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<ITitheService, TitheService>();
 builder.Services.AddScoped<IChurchService, ChurchService>();
+
 // Token Generator
 builder.Services.AddScoped<ITokenService, TokenService>();
 
@@ -62,7 +66,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = jwtSettings["Issuer"],
             ValidAudience = jwtSettings["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(key),
-            ClockSkew = TimeSpan.Zero, // sem toler�ncia de atraso
+            ClockSkew = TimeSpan.Zero, // sem tolerância de atraso
             NameClaimType = ClaimTypes.NameIdentifier,
             RoleClaimType = ClaimTypes.Role
         };
