@@ -9,6 +9,7 @@ namespace DonateFaith.Domain.DTOs
 {
     public class ChurchDTO
     {
+        public string? Code { get; set; }
         public int Id { get; set; }
         public int PastorId { get; set; }
         public string Name { get; set; }

@@ -24,6 +24,7 @@ namespace DonateFaith.Domain.Infra.Services
 
             return new ChurchDTO
             {
+                Code = church.Code,
                 PastorId = church.PastorId,
                 Id = church.Id,
                 Name = church.Name,

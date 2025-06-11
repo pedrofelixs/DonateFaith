@@ -1,5 +1,6 @@
 ﻿using DonateFaith.Domain.DTOs;
 using DonateFaith.Domain.Interfaces;
+using DonateFaith.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -16,7 +17,15 @@ namespace DonateFaith.Domain.Api.Controllers
         {
             _service = service;
         }
+        [HttpGet("church/{churchId}")]
+        public async Task<IActionResult> GetByChurchId(int churchId)
+        {
+            var tithes = await _service.GetByChurchIdAsync(churchId);
+            if (tithes == null || !tithes.Any())
+                return NotFound("Nenhum dízimo encontrado para esta igreja.");
 
+            return Ok(tithes);
+        }
         // Registrar dízimo
         [HttpPost("give")]
         [Authorize(Roles = "Member, Pastor")]

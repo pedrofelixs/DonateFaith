@@ -34,6 +34,12 @@ namespace DonateFaith.Domain.Infra.Repositories
             _context.Tithes.Add(tithe);
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<Tithe>> GetByChurchIdAsync(int churchId)
+        {
+            return await _context.Tithes
+                .Where(t => t.ChurchId == churchId)
+                .ToListAsync();
+        }
 
         public async Task UpdateAsync(Tithe tithe)
         {

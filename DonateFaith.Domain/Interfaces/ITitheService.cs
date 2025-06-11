@@ -14,6 +14,7 @@ namespace DonateFaith.Domain.Interfaces
         Task AddAsync(TitheDTO titheDto);
         Task UpdateAsync(TitheDTO titheDto);
         Task DeleteAsync(int id);
+        Task<IEnumerable<TitheDTO>> GetByChurchIdAsync(int churchId);
 
         Task<IEnumerable<TitheDTO>> GetByUserIdAsync(int userId);
 

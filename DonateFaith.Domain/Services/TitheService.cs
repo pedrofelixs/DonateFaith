@@ -47,6 +47,19 @@ namespace DonateFaith.Domain.Services
                 ChurchId = tithe.ChurchId
             };
         }
+        public async Task<IEnumerable<TitheDTO>> GetByChurchIdAsync(int churchId)
+        {
+            var tithes = await _repository.GetByChurchIdAsync(churchId);
+            return tithes.Select(t => new TitheDTO
+            {
+                Id = t.Id,
+                Amount = t.Amount,
+                Date = t.Date,
+                UserId = t.UserId,
+                ChurchId = t.ChurchId
+            });
+        }
+
 
         public async Task AddAsync(TitheDTO dto)
         {
