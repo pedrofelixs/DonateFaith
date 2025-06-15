@@ -3,10 +3,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from "recharts";
 import * as XLSX from "xlsx";
-// npm install xlsx
-// npm install recharts
-
-console.log("Token salvo no localStorage:", localStorage.getItem("token"));
 
 interface Donation {
   id: number;
@@ -35,36 +31,42 @@ const Relatorios = () => {
   const [churchCode, setChurchCode] = useState<string>("");
 
   useEffect(() => {
-      console.log("TokenData:", tokenData);
-      console.log("ChurchCode:", churchCode);
-    // Simulação de como o token poderia ser salvo após login
     const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setTokenData({
-        token: storedToken,
-        role: "Pastor",        // valor fixo ou vindo de outro lugar
-        userName: "felps",
-        churchId: 1
-      });
+    console.log("Token salvo no localStorage:", storedToken);
 
-      // Você pode ajustar isso para pegar o churchCode de uma API ou mapeamento
-      setChurchCode('1FL0W9');
+    if (!storedToken) {
+      console.warn("Nenhum token encontrado no localStorage.");
+      return;
     }
+
+    const tempTokenData: TokenData = {
+      token: storedToken,
+      role: "Pastor",
+      userName: "felps",
+      churchId: 1
+    };
+
+    const tempChurchCode = "1FLOW9";
+
+    setTokenData(tempTokenData);
+    setChurchCode(tempChurchCode);
+
+    const fetchDonations = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5289/api/Donation/by-church-code/${tempChurchCode}`, {
+          headers: {
+            Authorization: `Bearer ${storedToken}`
+          }
+        });
+        console.log("Dados recebidos da API:", response.data);
+        setDonations(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar doações:", error);
+      }
+    };
+
+    fetchDonations();
   }, []);
-
-  useEffect(() => {
-    if (!tokenData || !churchCode) return;
-
-    axios
-      .get(`/api/Donation/by-church-code/${churchCode}`, {
-        headers: { Authorization: `Bearer ${tokenData.token}` },
-      })
-      .then((res) => {
-        console.log("Dados recebidos da API:", res.data);
-        setDonations(res.data);
-      })
-      .catch((err) => console.error("Erro ao buscar doações:", err));
-  }, [tokenData, churchCode]);
 
   const exportExcel = (data: any[], fileName: string) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -102,7 +104,6 @@ const Relatorios = () => {
 
     metas.forEach((meta) => {
       const relacionadas = donations.filter((d) => d.parentDonationId === meta.id);
-      const inicio = new Date(meta.date);
       const porDia: Record<string, number> = {};
 
       relacionadas.forEach((d) => {
@@ -150,7 +151,6 @@ const Relatorios = () => {
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Relatórios e Gráficos</h1>
 
-      {/* Relatório: Usuário que mais doou */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Usuários que mais doaram</h2>
         <BarChart width={500} height={300} data={usuariosMaisDoaram()}>
@@ -162,7 +162,6 @@ const Relatorios = () => {
         <button className="mt-2 px-4 py-1 bg-blue-500 text-white rounded" onClick={() => exportExcel(usuariosMaisDoaram(), "usuarios-mais-doaram")}>Exportar Excel</button>
       </div>
 
-      {/* Relatório: Total doado por meta */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Total doado por meta</h2>
         <PieChart width={400} height={300}>
@@ -176,7 +175,6 @@ const Relatorios = () => {
         <button className="mt-2 px-4 py-1 bg-blue-500 text-white rounded" onClick={() => exportExcel(totalPorMeta(), "total-por-meta")}>Exportar Excel</button>
       </div>
 
-      {/* Relatório: Progresso diário */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Progresso diário por meta</h2>
         {Object.entries(progressoDiarioPorMeta()).map(([meta, dados]) => (
@@ -194,7 +192,6 @@ const Relatorios = () => {
         ))}
       </div>
 
-      {/* Relatório: Meta com mais doações */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Meta com maior número de doações</h2>
         <BarChart width={500} height={300} data={metaComMaisDoacoes()}>
@@ -206,7 +203,6 @@ const Relatorios = () => {
         <button className="mt-2 px-4 py-1 bg-blue-500 text-white rounded" onClick={() => exportExcel(metaComMaisDoacoes(), "meta-mais-doacoes")}>Exportar Excel</button>
       </div>
 
-      {/* Relatório: Porcentagem de Conclusão */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Porcentagem de Conclusão das Metas</h2>
         <BarChart width={500} height={300} data={porcentagemConclusaoMetas()}>
