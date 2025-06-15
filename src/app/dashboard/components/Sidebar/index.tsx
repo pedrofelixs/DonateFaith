@@ -1,6 +1,6 @@
 "use client";
 
-import { Cog, LifeBuoy, Search, BarChart, CheckSquare, Home, SquareStack, Users } from "lucide-react";
+import { Cog, LifeBuoy, Search, BarChart, CheckSquare, Home, SquareStack, Users, BarChart2, PieChartIcon } from "lucide-react";
 import Logo from "./Logo";
 import { NavItem } from "./NavItem";
 import Profile from "./Profile";
@@ -28,6 +28,9 @@ export default function Sidebar() {
           ]}/>
         <NavItem title="Membros" icon={Users} children={[
             { label: "Adicionar membros", href: "/dashboard/membros/adicionar" },
+          ]}/>
+        <NavItem title="Relatórios" icon={PieChartIcon} children={[
+            { label: "Relatórios", href: "/dashboard/relatorios" },
           ]}/>
       </nav>
 
