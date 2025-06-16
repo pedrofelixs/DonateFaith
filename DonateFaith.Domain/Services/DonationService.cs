@@ -81,6 +81,10 @@ public class DonationService : IDonationService
         var donation = await _donationRepository.GetByIdAsync(dto.Id);
         if (donation != null)
         {
+            donation.Name = dto.Name;
+            donation.CreatedAt = dto.Date;
+            donation.GoalsAmount = dto.GoalsAmount;
+            donation.Description = dto.Description;
             donation.Amount = dto.Amount;
             donation.DonationDate = dto.Date;
             await _donationRepository.UpdateAsync(donation);
