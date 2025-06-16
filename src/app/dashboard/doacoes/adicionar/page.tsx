@@ -128,7 +128,7 @@ const CriarMetaDoacao = () => {
       if (!res.ok) throw new Error('Erro ao criar meta de doação');
 
       alert('Meta de doação criada com sucesso!');
-      router.push('/');
+      router.push('/dashboard/doacoes/gerenciar');
     } catch (error) {
       alert('Erro ao enviar os dados');
       console.error(error);

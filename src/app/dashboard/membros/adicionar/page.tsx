@@ -113,7 +113,7 @@ const CadastrarMembro = () => {
       if (!res.ok) throw new Error('Erro ao cadastrar membro');
 
       alert('Membro cadastrado com sucesso!');
-      router.push('/');
+      router.push('dashboard/membros/gerenciar');
     } catch (error) {
       alert('Erro ao enviar os dados');
       console.error(error);
