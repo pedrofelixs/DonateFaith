@@ -132,11 +132,22 @@ const IgrejaPage = () => {
       </header>
 
       {/* LOGIN / USERNAME */}
-      <div className="w-full max-w-7xl mx-auto px-4 mt-4 flex justify-end">
+      <div className="w-full max-w-7xl mx-auto px-4 mt-4 flex justify-end items-center gap-4">
         {userName ? (
-          <span className="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
-            {userName}
-          </span>
+          <>
+            <span className="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+              {userName}
+            </span>
+            <button
+              onClick={() => {
+                localStorage.removeItem("token");
+                router.push("/logindoador");
+              }}
+              className="text-sm md:text-base text-red-600 dark:text-red-400 hover:underline"
+            >
+              Sair
+            </button>
+          </>
         ) : (
           <button
             onClick={() => router.push("/logindoador")}
