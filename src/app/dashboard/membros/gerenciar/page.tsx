@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 
 export default function MembersPage() {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [churchId, setChurchId] = useState<number | null>(null);
 
-  const churchId = 4; // ou pegue dinamicamente do token, contexto, etc.
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  const token = localStorage.getItem("token");
-
-  const fetchMembers = async () => {
+  const fetchMembers = async (id: number) => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5289/api/Member/church/${churchId}`, {
+      const res = await fetch(`http://localhost:5289/api/Member/church/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -54,7 +54,35 @@ export default function MembersPage() {
   };
 
   useEffect(() => {
-    fetchMembers();
+    const init = async () => {
+      if (token) {
+        try {
+          const decoded: any = jwtDecode(token);
+          const pastorId = parseInt(
+            decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]
+          );
+
+          // Busca o ID da igreja pelo pastorId
+          const res = await fetch(`http://localhost:5289/api/church/pastor/${pastorId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!res.ok) throw new Error("Erro ao buscar igreja");
+
+          const data = await res.json();
+          setChurchId(data.id);
+
+          // Agora busca membros com o churchId obtido
+          fetchMembers(data.id);
+        } catch (error) {
+          console.error("Erro:", error);
+        }
+      }
+    };
+
+    init();
   }, []);
 
   return (
