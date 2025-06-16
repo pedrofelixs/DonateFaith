@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=1q2w3e4r@#$
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - myapp_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: myapp_container
+    depends_on:
+      - sqlserver
+    networks:
+      - myapp_network
+
+networks:
+  myapp_network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
