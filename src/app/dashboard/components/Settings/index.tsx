@@ -61,7 +61,6 @@ export default function SettingsTabs() {
     }
   }, [currentTab]);
 
-  // Função para baixar o QR Code (SVG -> PNG)
   const downloadQRCode = () => {
     const svg = qrRef.current;
     if (!svg) return;
@@ -111,15 +110,25 @@ export default function SettingsTabs() {
             </span>
 
             {igreja?.code && (
-              <QRCodeSVG
-                ref={qrRef}
-                value={`http://localhost:3000/igreja?code=${igreja.code}`}
-                size={150}
-                bgColor="#FFFFFF"
-                fgColor="#000000"
-                level="H"
-                includeMargin={true}
-              />
+              <>
+                <QRCodeSVG
+                  ref={qrRef}
+                  value={`http://localhost:3000/igreja?code=${igreja.code}`}
+                  size={150}
+                  bgColor="#FFFFFF"
+                  fgColor="#000000"
+                  level="H"
+                  includeMargin={true}
+                />
+                <a
+                  href={`http://localhost:3000/igreja?code=${igreja.code}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 text-sm text-blue-400 underline break-all text-center"
+                >
+                  http://localhost:3000/igreja?code={igreja.code}
+                </a>
+              </>
             )}
 
             <button
@@ -130,9 +139,6 @@ export default function SettingsTabs() {
             </button>
           </div>
         </Tabs.Content>
-
-
-
       </div>
     </Tabs.Root>
   );
