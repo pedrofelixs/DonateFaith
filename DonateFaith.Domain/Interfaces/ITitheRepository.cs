@@ -9,8 +9,6 @@ namespace DonateFaith.Domain.Interfaces
         Task AddAsync(Tithe tithe);
         Task UpdateAsync(Tithe tithe);
         Task DeleteAsync(int id);
-        Task<IEnumerable<Tithe>> GetByCampaignIdAsync(int campaignId);
-        Task<IEnumerable<Tithe>> GetCampaignsByChurchIdAsync(int churchId);
         Task<IEnumerable<Tithe>> GetByChurchIdAsync(int churchId);
 
         Task<IEnumerable<Tithe>> GetByUserIdAsync(int userId);

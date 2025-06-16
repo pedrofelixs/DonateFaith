@@ -28,6 +28,13 @@ namespace DonateFaith.Domain.Infra.Repositories
                 .FirstOrDefaultAsync(u => u.Id == id && u.Role == UserRole.Member);
         }
 
+        public async Task<IEnumerable<User>> GetMembersByChurchIdAsync(int churchId)
+{
+        return await _context.Users
+            .Where(u => u.ChurchId == churchId && u.Role == UserRole.Member)
+            .ToListAsync();
+}
+
         public async Task AddMemberAsync(User member)
         {
             member.Role = UserRole.Member;

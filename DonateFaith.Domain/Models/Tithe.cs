@@ -14,7 +14,6 @@ namespace DonateFaith.Domain.Models
         public User User { get; set; }
         public DateTime? Date { get; set; }
         public int? TransactionId { get; set; }
-        public int? CampaignId { get; set; }
         public ICollection<Tithe>? Tithes { get; set; }
 
         [ForeignKey(nameof(TransactionId))]

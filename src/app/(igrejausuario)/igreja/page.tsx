@@ -1,10 +1,11 @@
 "use client";
+
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
-import  Link  from "next/link";
+import Link from "next/link";
 
 interface Event {
   id: number;
@@ -24,25 +25,14 @@ interface Donation {
 }
 
 interface Church {
+  id: number;
   name: string;
   address: string;
 }
 
 const IgrejaPage = () => {
   const [userName, setUserName] = useState<string | null>(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded: any = jwtDecode(token);
-        const id = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-        setUserName(id);
-      } catch (err) {
-        console.error("Erro ao decodificar token:", err);
-      }
-    }
-  }, []);
+  const [isMember, setIsMember] = useState<boolean>(false);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -54,17 +44,49 @@ const IgrejaPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        const name = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+        setUserName(name);
+      } catch (err) {
+        console.error("Erro ao decodificar token:", err);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (!code) return;
 
     setLoading(true);
 
-    const churchRequest = axios.get(`http://localhost:5289/api/church/code/${code}`);
-    const eventsRequest = axios.get(`http://localhost:5289/api/Event/by-church-code/${code}`);
-    const donationsRequest = axios.get(`http://localhost:5289/api/Donation/code/${code}`);
+    const token = localStorage.getItem("token");
 
-    Promise.all([churchRequest, eventsRequest, donationsRequest])
-      .then(([churchRes, eventsRes, donationsRes]) => {
-        setChurch(churchRes.data);
+    const fetchAll = async () => {
+      try {
+        const [churchRes, eventsRes, donationsRes] = await Promise.all([
+          axios.get(`http://localhost:5289/api/church/code/${code}`),
+          axios.get(`http://localhost:5289/api/Event/by-church-code/${code}`),
+          axios.get(`http://localhost:5289/api/Donation/code/${code}`),
+        ]);
+
+        const churchData = churchRes.data;
+        setChurch(churchData);
+
+        // Verificar se usuário é membro usando o novo endpoint
+        if (token && churchData.id) {
+          const memberCheck = await axios.get(
+            `http://localhost:5289/api/Member/is-member/${churchData.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setIsMember(memberCheck.data.isMember);
+          console.log("Usuário é membro:", memberCheck.data.isMember);
+        }
 
         const mappedEvents = eventsRes.data.map((e: any) => ({
           id: e.id,
@@ -76,23 +98,24 @@ const IgrejaPage = () => {
         setEvents(mappedEvents);
 
         const mappedDonations = donationsRes.data
-        .filter((d: any) => d.parentDonationId === null)
-        .map((d: any) => ({
-          id: d.id,
-          name: d.name,
-          amount: d.amount,
-          goalsAmount: d.goalsAmount,
-          date: d.date,
-          description: d.description,
-        }));
+          .filter((d: any) => d.parentDonationId === null)
+          .map((d: any) => ({
+            id: d.id,
+            name: d.name,
+            amount: d.amount,
+            goalsAmount: d.goalsAmount,
+            date: d.date,
+            description: d.description,
+          }));
         setDonations(mappedDonations);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Erro ao buscar dados:", err);
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchAll();
   }, [code]);
 
   if (loading) return <p className="text-center mt-10">Carregando...</p>;
@@ -100,21 +123,15 @@ const IgrejaPage = () => {
 
   return (
     <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-      {/* HEADER COM LOGO */}
+      {/* HEADER */}
       <header className="w-full bg-gray-800 text-white py-4 shadow-md">
         <div className="max-w-7xl mx-auto flex justify-center items-center gap-4">
-          <Image
-            src="/images/Logo/Logo.svg"
-            alt="logo"
-            width={50}
-            height={50}
-            quality={100}
-          />
+          <Image src="/images/Logo/Logo.svg" alt="logo" width={50} height={50} quality={100} />
           <span className="text-2xl font-semibold">DonateFaith</span>
         </div>
       </header>
 
-      {/* LOGIN/USERNAME */}
+      {/* LOGIN / USERNAME */}
       <div className="w-full max-w-7xl mx-auto px-4 mt-4 flex justify-end">
         {userName ? (
           <span className="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
@@ -136,11 +153,24 @@ const IgrejaPage = () => {
         <p className="text-center text-gray-600 dark:text-gray-300 mb-4">
           <strong>Endereço:</strong> {church.address}
         </p>
-        <p className="text-center text-gray-700 dark:text-gray-300 mb-4">Igreja errada?  {" "}
+        <p className="text-center text-gray-700 dark:text-gray-300 mb-4">
+          Igreja errada?{" "}
           <Link href="/codigo" className="text-sky-600 hover:underline">
             Insira o código novamente
-        </Link>
+          </Link>
         </p>
+
+        {/* Botão Pagar Dízimo, só se for membro */}
+        {isMember && (
+          <div className="text-center mb-8">
+            <button
+              onClick={() => router.push(`/pagardizimo?code=${code}`)}
+              className="py-3 px-6 bg-yellow-500 text-white rounded shadow hover:bg-yellow-600 transition"
+            >
+              Pagar Dízimo
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-7xl mx-auto">
           {/* DOAÇÕES */}

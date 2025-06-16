@@ -43,10 +43,10 @@ const Relatorios = () => {
       token: storedToken,
       role: "Pastor",
       userName: "felps",
-      churchId: 1
+      churchId: 4
     };
 
-    const tempChurchCode = "1FLOW9";
+    const tempChurchCode = "57HS4R";
 
     setTokenData(tempTokenData);
     setChurchCode(tempChurchCode);

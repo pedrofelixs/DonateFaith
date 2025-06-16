@@ -11,6 +11,7 @@ namespace DonateFaith.Domain.Interfaces
     {
         Task<IEnumerable<User>> GetAllMembersAsync();
         Task<User?> GetMemberByIdAsync(int id);
+        Task<IEnumerable<User>> GetMembersByChurchIdAsync(int churchId);
         Task AddMemberAsync(User member);
         Task UpdateMemberAsync(User member);
         Task DeleteMemberAsync(int id);

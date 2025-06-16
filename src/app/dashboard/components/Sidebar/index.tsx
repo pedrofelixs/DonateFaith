@@ -28,6 +28,7 @@ export default function Sidebar() {
           ]}/>
         <NavItem title="Membros" icon={Users} children={[
             { label: "Adicionar membros", href: "/dashboard/membros/adicionar" },
+            { label: "Gerenciar membros", href: "/dashboard/membros/gerenciar" },
           ]}/>
         <NavItem title="Relatórios" icon={PieChartIcon} children={[
             { label: "Relatórios", href: "/dashboard/relatorios" },

@@ -15,7 +15,6 @@ namespace DonateFaith.Domain.Interfaces
             Task AddMemberAsync(CreateMemberDTO member, int pastorId);
             Task UpdateMemberAsync(UserDTO member);
             Task DeleteMemberAsync(int id);
-       
-
+            Task<IEnumerable<UserDTO>> GetMembersByChurchIdAsync(int churchId);
     }
 }

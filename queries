@@ -77,7 +77,7 @@ CREATE TABLE Donations (
     TransactionId INT NULL,
     UserId INT NOT NULL,
     CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-    DonationId INT NULL,
+    ParentDonationId INT NULL,
     CONSTRAINT FK_Donations_Churches FOREIGN KEY (ChurchId) REFERENCES Churches(Id) ON DELETE CASCADE,
     CONSTRAINT FK_Donations_Donations FOREIGN KEY (DonationId) REFERENCES Donations(Id),
     CONSTRAINT FK_Donations_Transactions FOREIGN KEY (TransactionId) REFERENCES Transactions(Id),
@@ -192,3 +192,12 @@ ALTER COLUMN ChurchId INT NULL;
 
 ALTER TABLE Users
 ALTER COLUMN ChurchCode NVARCHAR(MAX) NULL;
+
+ALTER TABLE Tithes
+ALTER COLUMN TransactionId INT NULL;
+
+ALTER TABLE Tithes
+ALTER COLUMN TitheDate DATETIME2 NULL;
+
+ALTER TABLE Tithes
+ALTER COLUMN MemberId INT NULL;

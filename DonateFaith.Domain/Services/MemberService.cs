@@ -41,6 +41,19 @@ namespace DonateFaith.Domain.Services
             };
         }
 
+        public async Task<IEnumerable<UserDTO>> GetMembersByChurchIdAsync(int churchId)
+{
+        var members = await _memberRepository.GetMembersByChurchIdAsync(churchId);
+        return members.Select(member => new UserDTO
+        {
+            Id = member.Id,
+            FullName = member.FullName,
+            Email = member.Email,
+            CPF = member.CPF
+            // Adapte os campos conforme seu DTO
+        });
+}
+
         public async Task AddMemberAsync(CreateMemberDTO dto, int pastorId)
         {
             var pastor = await _userRepository.GetByIdAsync(pastorId);
