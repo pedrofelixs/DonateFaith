@@ -19,6 +19,8 @@ namespace DonateFaith.Domain.Interfaces
         Task AddAsync(Donation donation);
         Task UpdateAsync(Donation donation);
         Task DeleteAsync(int id);
+
+        Task AddDonationWithParentUpdateAsync(Donation donation);
     }
 
 }

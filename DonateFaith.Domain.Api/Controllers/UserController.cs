@@ -1,4 +1,5 @@
-﻿using DonateFaith.Domain.Services;
+﻿using DonateFaith.Domain.Interfaces;
+using DonateFaith.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DonateFaith.Domain.Api.Controllers
@@ -7,9 +8,9 @@ namespace DonateFaith.Domain.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UserController(UserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
         }
@@ -27,6 +28,23 @@ namespace DonateFaith.Domain.Api.Controllers
                 },
                 Error = (string)null
             });
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            try
+            {
+                var userDto = await _userService.GetByIdAsync(id);
+                if (userDto == null)
+                    return NotFound(new { Message = "Usuário não encontrado." });
+
+                return Ok(userDto);
+            }
+            catch (Exception ex)
+            {
+                // Pode logar o erro aqui se desejar
+                return StatusCode(500, new { Message = "Erro interno do servidor.", Details = ex.Message });
+            }
         }
     }
 }

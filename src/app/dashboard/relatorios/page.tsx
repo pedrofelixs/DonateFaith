@@ -1,8 +1,22 @@
 'use client';
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  CartesianGrid,
+  Legend,
+} from "recharts";
 import * as XLSX from "xlsx";
+import {jwtDecode} from "jwt-decode";
 
 interface Donation {
   id: number;
@@ -16,56 +30,105 @@ interface Donation {
   parentDonationId: number | null;
 }
 
+interface User {
+  id: number;
+  fullName: string;
+  cpf: string | null;
+  email: string;
+  role: number;
+}
+
 interface TokenData {
   token: string;
   role: string;
   userName: string;
-  churchId: number;
+  pastorId: number;
 }
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AA66CC"];
 
 const Relatorios = () => {
   const [donations, setDonations] = useState<Donation[]>([]);
+  const [usersMap, setUsersMap] = useState<Record<number, User>>({});
   const [tokenData, setTokenData] = useState<TokenData | null>(null);
   const [churchCode, setChurchCode] = useState<string>("");
+  const [churchId, setChurchId] = useState<number | null>(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-    console.log("Token salvo no localStorage:", storedToken);
 
     if (!storedToken) {
       console.warn("Nenhum token encontrado no localStorage.");
       return;
     }
 
-    const tempTokenData: TokenData = {
-      token: storedToken,
-      role: "Pastor",
-      userName: "felps",
-      churchId: 4
-    };
+    try {
+      const decoded: any = jwtDecode(storedToken);
+      const pastorId = parseInt(
+        decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]
+      );
+      const userName = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+      const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
 
-    const tempChurchCode = "57HS4R";
+      setTokenData({
+        token: storedToken,
+        role,
+        userName,
+        pastorId,
+      });
 
-    setTokenData(tempTokenData);
-    setChurchCode(tempChurchCode);
-
-    const fetchDonations = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5289/api/Donation/by-church-code/${tempChurchCode}`, {
+      // Buscar dados da igreja pelo pastorId
+      axios
+        .get(`http://localhost:5289/api/church/pastor/${pastorId}`, {
           headers: {
-            Authorization: `Bearer ${storedToken}`
-          }
-        });
-        console.log("Dados recebidos da API:", response.data);
-        setDonations(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar doações:", error);
-      }
-    };
+            Authorization: `Bearer ${storedToken}`,
+          },
+        })
+        .then((response) => {
+          const igreja = response.data;
+          setChurchCode(igreja.code);
+          setChurchId(igreja.id);
 
-    fetchDonations();
+          // Agora busca as doações
+          return axios.get(`http://localhost:5289/api/Donation/by-church-code/${igreja.code}`, {
+            headers: {
+              Authorization: `Bearer ${storedToken}`,
+            },
+          });
+        })
+        .then(async (donationRes) => {
+          setDonations(donationRes.data);
+
+          // Busca os dados dos usuários que mais doaram
+          const doadoresIds = Array.from(
+            new Set(
+              donationRes.data
+                .filter((d: Donation) => d.parentDonationId !== null)
+                .map((d: Donation) => d.userId)
+            )
+          );
+
+          // Buscar dados dos usuários em paralelo
+          const usersRequests = doadoresIds.map((id) =>
+            axios.get<User>(`http://localhost:5289/api/users/${id}`, {
+              headers: { Authorization: `Bearer ${storedToken}` },
+            })
+          );
+
+          const usersResponses = await Promise.all(usersRequests);
+          const usersData: Record<number, User> = {};
+          usersResponses.forEach((res) => {
+            usersData[res.data.id] = res.data;
+          });
+
+          setUsersMap(usersData);
+        })
+        .catch((err) => {
+          console.error("Erro ao buscar dados:", err);
+        });
+    } catch (err) {
+      console.error("Erro ao decodificar token:", err);
+    }
   }, []);
 
   const exportExcel = (data: any[], fileName: string) => {
@@ -75,8 +138,9 @@ const Relatorios = () => {
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
   };
 
+  // Função que retorna os usuários que mais doaram, com nomes
   const usuariosMaisDoaram = () => {
-    const result: Record<string, number> = {};
+    const result: Record<number, number> = {};
     donations
       .filter((d) => d.parentDonationId !== null)
       .forEach((d) => {
@@ -84,11 +148,13 @@ const Relatorios = () => {
       });
 
     return Object.entries(result).map(([userId, amount]) => ({
-      userId,
+      userId: Number(userId),
       amount,
+      fullName: usersMap[Number(userId)]?.fullName || `Usuário #${userId}`,
     }));
   };
 
+  // Mesmas funções já existentes para outros relatórios
   const totalPorMeta = () => {
     const metas = donations.filter((d) => d.parentDonationId === null);
     return metas.map((meta) => {
@@ -111,9 +177,10 @@ const Relatorios = () => {
         porDia[dia] = (porDia[dia] || 0) + d.amount;
       });
 
-      progresso[meta.name || `Meta #${meta.id}`] = Object.entries(porDia).map(
-        ([dia, total]) => ({ dia, total })
-      );
+      progresso[meta.name || `Meta #${meta.id}`] = Object.entries(porDia).map(([dia, total]) => ({
+        dia,
+        total,
+      }));
     });
 
     return progresso;
@@ -154,12 +221,17 @@ const Relatorios = () => {
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Usuários que mais doaram</h2>
         <BarChart width={500} height={300} data={usuariosMaisDoaram()}>
-          <XAxis dataKey="userId" />
+          <XAxis dataKey="fullName" />
           <YAxis />
           <Tooltip />
           <Bar dataKey="amount" fill="#8884d8" />
         </BarChart>
-        <button className="mt-2 px-4 py-1 bg-blue-500 text-white rounded" onClick={() => exportExcel(usuariosMaisDoaram(), "usuarios-mais-doaram")}>Exportar Excel</button>
+        <button
+          className="mt-2 px-4 py-1 bg-blue-500 text-white rounded"
+          onClick={() => exportExcel(usuariosMaisDoaram(), "usuarios-mais-doaram")}
+        >
+          Exportar Excel
+        </button>
       </div>
 
       <div className="mb-8">
@@ -172,7 +244,12 @@ const Relatorios = () => {
           </Pie>
           <Tooltip />
         </PieChart>
-        <button className="mt-2 px-4 py-1 bg-blue-500 text-white rounded" onClick={() => exportExcel(totalPorMeta(), "total-por-meta")}>Exportar Excel</button>
+        <button
+          className="mt-2 px-4 py-1 bg-blue-500 text-white rounded"
+          onClick={() => exportExcel(totalPorMeta(), "total-por-meta")}
+        >
+          Exportar Excel
+        </button>
       </div>
 
       <div className="mb-8">
@@ -200,7 +277,12 @@ const Relatorios = () => {
           <Tooltip />
           <Bar dataKey="quantidade" fill="#82ca9d" />
         </BarChart>
-        <button className="mt-2 px-4 py-1 bg-blue-500 text-white rounded" onClick={() => exportExcel(metaComMaisDoacoes(), "meta-mais-doacoes")}>Exportar Excel</button>
+        <button
+          className="mt-2 px-4 py-1 bg-blue-500 text-white rounded"
+          onClick={() => exportExcel(metaComMaisDoacoes(), "meta-mais-doacoes")}
+        >
+          Exportar Excel
+        </button>
       </div>
 
       <div className="mb-8">
@@ -211,7 +293,12 @@ const Relatorios = () => {
           <Tooltip />
           <Bar dataKey="porcentagem" fill="#ff7300" />
         </BarChart>
-        <button className="mt-2 px-4 py-1 bg-blue-500 text-white rounded" onClick={() => exportExcel(porcentagemConclusaoMetas(), "porcentagem-conclusao")}>Exportar Excel</button>
+        <button
+          className="mt-2 px-4 py-1 bg-blue-500 text-white rounded"
+          onClick={() => exportExcel(porcentagemConclusaoMetas(), "porcentagem-conclusao")}
+        >
+          Exportar Excel
+        </button>
       </div>
     </div>
   );

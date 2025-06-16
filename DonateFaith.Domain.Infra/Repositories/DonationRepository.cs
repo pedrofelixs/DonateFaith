@@ -73,4 +73,23 @@ public class DonationRepository : IDonationRepository
             await _context.SaveChangesAsync();
         }
     }
+    public async Task AddDonationWithParentUpdateAsync(Donation donation)
+{
+    _context.Donations.Add(donation);
+
+    if (donation.ParentDonationId.HasValue)
+    {
+        var parentDonation = await _context.Donations
+            .FirstOrDefaultAsync(d => d.Id == donation.ParentDonationId.Value);
+
+        if (parentDonation != null)
+        {
+            parentDonation.Amount += donation.Amount;
+            _context.Donations.Update(parentDonation);
+        }
+    }
+
+    // 3️⃣ Salva tudo junto na mesma transação
+    await _context.SaveChangesAsync();
+}
 }

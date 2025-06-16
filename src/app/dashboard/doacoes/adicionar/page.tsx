@@ -166,6 +166,7 @@ const CriarMetaDoacao = () => {
               value={formData.date}
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-md bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+              placeholder='Data e Hora'
               required
             />
             {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}

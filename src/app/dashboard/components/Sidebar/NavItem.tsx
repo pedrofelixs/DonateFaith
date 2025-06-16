@@ -10,9 +10,10 @@ interface NavItemProps {
   icon: ElementType;
   href?: string;
   children?: { label: string; href: string }[];
+  onNavigate?: () => void; // ✅ ADICIONE ISTO
 }
 
-export function NavItem({ title, icon: Icon, href, children }: NavItemProps) {
+export function NavItem({ title, icon: Icon, href, children, onNavigate }: NavItemProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const hasChildren = children && children.length > 0;
@@ -22,6 +23,7 @@ export function NavItem({ title, icon: Icon, href, children }: NavItemProps) {
       setOpen(!open);
     } else if (href) {
       router.push(href);
+      onNavigate?.(); 
     }
   };
 
@@ -50,6 +52,7 @@ export function NavItem({ title, icon: Icon, href, children }: NavItemProps) {
             <Link
               key={child.label}
               href={child.href}
+              onClick={onNavigate} // ✅ FECHA QUANDO CLICA NO FILHO
               className="block text-sm text-gray-400 hover:text-white"
             >
               {child.label}

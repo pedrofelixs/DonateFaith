@@ -199,6 +199,7 @@ const Doacoes = () => {
                 setEditDonation({ ...editDonation, date: `${e.target.value}T00:00:00` })
               }
               className="w-full px-4 py-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+              placeholder="Data"
             />
             <div className="flex justify-end gap-3">
               <button
