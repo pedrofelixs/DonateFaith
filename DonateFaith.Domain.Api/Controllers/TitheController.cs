@@ -26,7 +26,7 @@ namespace DonateFaith.Domain.Api.Controllers
 
             return Ok(tithes);
         }
-        // Registrar dízimo
+        
         [HttpPost("give")]
         [Authorize(Roles = "Member, Pastor")]
         public async Task<IActionResult> GiveTithe([FromBody] TitheDTO dto)
@@ -35,7 +35,7 @@ namespace DonateFaith.Domain.Api.Controllers
             return Ok(new { message = "Dízimo registrado com sucesso." });
         }
 
-        // Ver todos os dízimos (para o pastor)
+        
         [HttpGet("all")]
         [Authorize(Roles = "Pastor")]
         public async Task<IActionResult> GetAllTithes(int page = 1, int pageSize = 10)
@@ -44,7 +44,7 @@ namespace DonateFaith.Domain.Api.Controllers
             return Ok(result);
         }
 
-        // Ver dízimos por membro (para o membro ou pastor)
+        
         [HttpGet("user/{userId}")]
         [Authorize(Roles = "Member, Pastor")]
         public async Task<IActionResult> GetUserTithes(int userId)

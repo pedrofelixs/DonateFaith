@@ -39,16 +39,16 @@ namespace DonateFaith.Domain.Infra.Data
             modelBuilder.Entity<AdminChurch>()
             .HasKey(ac => new { ac.AdminId, ac.ChurchId });
 
-            // Configurar relacionamentos (opcional, mas recomendado)
+            
             modelBuilder.Entity<AdminChurch>()
                 .HasOne(ac => ac.Admin)
-                .WithMany() // Se quiser, pode configurar a navegação inversa no User
+                .WithMany() 
                 .HasForeignKey(ac => ac.AdminId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<AdminChurch>()
                 .HasOne(ac => ac.Church)
-                .WithMany() // Se quiser, pode configurar a navegação inversa no Church
+                .WithMany() 
                 .HasForeignKey(ac => ac.ChurchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -66,7 +66,7 @@ namespace DonateFaith.Domain.Infra.Data
                 .HasForeignKey(u => u.ChurchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // 🔗 Tithe.User (1:N)
+            
             modelBuilder.Entity<Tithe>()
                 .HasOne(t => t.User)
                 .WithMany(u => u.Tithes)
@@ -74,14 +74,14 @@ namespace DonateFaith.Domain.Infra.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
 
-            // 🔗 Tithe.Church
+            
             modelBuilder.Entity<Tithe>()
                 .HasOne(t => t.Church)
                 .WithMany(c => c.Tithes)
                 .HasForeignKey(t => t.ChurchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // 🔗 Donation.User
+            
             modelBuilder.Entity<Donation>()
                 .HasOne(d => d.User)
                 .WithMany()
@@ -116,7 +116,6 @@ namespace DonateFaith.Domain.Infra.Data
                 .HasForeignKey(e => e.ChurchId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // 🔗 Transaction (Donation / Tithe) — se necessário
             modelBuilder.Entity<Donation>()
                 .HasOne(d => d.Transaction)
                 .WithOne()

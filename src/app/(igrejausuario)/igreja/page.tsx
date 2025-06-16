@@ -119,7 +119,27 @@ const IgrejaPage = () => {
   }, [code]);
 
   if (loading) return <p className="text-center mt-10">Carregando...</p>;
-  if (!church) return <p className="text-center mt-10">Igreja não encontrada.</p>;
+  if (!church && !loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 text-center px-4">
+        <Image src="/images/Logo/Logo.svg" alt="Logo" width={80} height={80} className="mb-6" />
+        <h1 className="text-3xl md:text-5xl font-bold text-sky-700 mb-4">
+          Igreja não encontrada
+        </h1>
+        <p className="text-gray-700 dark:text-gray-300 mb-6">
+          O código informado não corresponde a nenhuma igreja cadastrada.
+          <br />
+          Verifique o código ou tente novamente.
+        </p>
+        <Link
+          href="/codigo"
+          className="inline-block py-3 px-6 bg-sky-600 text-white rounded shadow hover:bg-sky-700 transition"
+        >
+          Inserir código novamente
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">

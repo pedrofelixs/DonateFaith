@@ -18,7 +18,7 @@ namespace DonateFaith.Domain.Api.Controllers
             _donationService = donationService;
         }
 
-        // 🔓 GET público por código da igreja
+        
         [HttpGet("code/{churchCode}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetByChurchCode(string churchCode)
@@ -27,7 +27,7 @@ namespace DonateFaith.Domain.Api.Controllers
             return Ok(donations);
         }
 
-        // 🔓 GET público da única doação do sistema
+        
         [HttpGet("only-one")]
         [AllowAnonymous]
         public async Task<IActionResult> GetSingleDonation()
@@ -37,7 +37,7 @@ namespace DonateFaith.Domain.Api.Controllers
             return Ok(donation);
         }
 
-        // 🔐 POST para checkout — qualquer usuário autenticado pode doar
+        
         [HttpPost("checkout")]
         [Authorize]
         public async Task<IActionResult> Checkout([FromBody] DonationDTO dto)
@@ -45,7 +45,7 @@ namespace DonateFaith.Domain.Api.Controllers
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             dto.UserId = userId;
 
-            // Garantir que ParentDonationId está presente para associar à campanha
+            
             if (dto.ParentDonationId == null)
                 return BadRequest("A doação deve estar associada a uma campanha.");
 
@@ -53,7 +53,7 @@ namespace DonateFaith.Domain.Api.Controllers
             return Ok(new { message = "Doação realizada com sucesso!" });
         }
 
-        // 🔐 POST para criar uma nova campanha de doação — apenas Pastores
+        
         [HttpPost]
         [Authorize(Roles = "Pastor")]
         public async Task<IActionResult> Create([FromBody] DonationDTO dto)
@@ -61,7 +61,7 @@ namespace DonateFaith.Domain.Api.Controllers
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             dto.UserId = userId;
 
-            // Campanha não deve ter ParentDonationId
+            
             dto.ParentDonationId = null;
 
             await _donationService.CreateDonationAsync(dto);

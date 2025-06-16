@@ -10,29 +10,30 @@ const inter = Inter({ subsets: ["latin"] });
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Regra:
-  // - Mobile: se isOpen -> [18rem 1fr], se !isOpen -> [0 1fr]
-  // - Desktop: sempre [18rem 1fr]
-  const gridCols = `grid-cols-[${isOpen ? "18rem" : "0"}_1fr] md:grid-cols-[18rem_1fr]`;
-
   return (
-    <div
-      className={`min-h-screen w-full grid transition-[grid-template-columns] duration-300 ease-in-out ${gridCols} ${inter.className}`}
-    >
-      <aside className="bg-gray-800 overflow-hidden">
+    <div className={`min-h-screen w-full grid md:grid-cols-[18rem_1fr] ${inter.className}`}>
+      {/* Sidebar */}
+      <aside
+        className={`
+          md:relative md:translate-x-0 md:w-auto
+          fixed top-0 left-0 h-full w-72 bg-gray-800 z-50
+          transform transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
         <Sidebar onNavigate={() => setIsOpen(false)} />
       </aside>
 
-      <main className="relative">
-        {/* Botão só no mobile */}
-        {!isOpen && (
-          <button
-            onClick={() => setIsOpen(true)}
-            className="md:hidden fixed top-4 right-4 z-50 bg-gray-800 text-white p-2 rounded-md"
-          >
-            ☰
-          </button>
-        )}
+      {/* Conteúdo */}
+      <main className="relative w-full">
+        {/* Botão toggle mobile */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden fixed top-4 left-4 z-50 bg-gray-800 text-white p-2 rounded-md"
+        >
+          {isOpen ? "✕" : "☰"}
+        </button>
+
         {children}
       </main>
     </div>

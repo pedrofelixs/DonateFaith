@@ -55,16 +55,16 @@ namespace DonateFaith.Domain.Infra.Services
                 Address = dto.Address,
                 Phone = dto.Phone,
                 FoundedDate = dto.FoundedDate,
-                Code = GenerateRandomCode(6) // gere ao criar
+                Code = GenerateRandomCode(6) 
             };
 
             _context.Churches.Add(church);
             await _context.SaveChangesAsync();
 
-            pastor.ChurchId = church.Id; // ✅ correto
+            pastor.ChurchId = church.Id; 
             await _context.SaveChangesAsync();
 
-            return church.Code; // retorno do código
+            return church.Code; 
         }
         public async Task<ChurchDTO?> GetChurchByCodeAsync(string code)
         {
@@ -97,7 +97,7 @@ namespace DonateFaith.Domain.Infra.Services
             church.Phone = dto.Phone;
             church.FoundedDate = dto.FoundedDate;
 
-            // Gerar código caso não tenha
+            
             if (string.IsNullOrEmpty(church.Code))
                 church.Code = GenerateRandomCode(6);
 

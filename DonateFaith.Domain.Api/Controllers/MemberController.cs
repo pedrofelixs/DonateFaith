@@ -8,7 +8,7 @@ namespace DonateFaith.Domain.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // Permite qualquer usuário autenticado; as roles são por método.
+    [Authorize] 
     public class MemberController : ControllerBase
     {
         private readonly IMemberService _memberService;
@@ -81,7 +81,7 @@ namespace DonateFaith.Domain.Api.Controllers
             if (claim == null)
                 return Unauthorized("Token sem claim de identificação.");
 
-            int memberId = int.Parse(claim.Value); // Membro == User == Id do token
+            int memberId = int.Parse(claim.Value); 
 
             var members = await _memberService.GetMembersByChurchIdAsync(churchId);
 

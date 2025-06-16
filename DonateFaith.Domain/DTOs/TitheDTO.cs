@@ -12,7 +12,7 @@ namespace DonateFaith.Domain.DTOs
         public decimal? Amount { get; set; }
         public int UserId { get; set; }
         public int ChurchId { get; set; }
-        public DateTime? Date { get; set; } = DateTime.Now; // identifica a "campanha" de dízimos
+        public DateTime? Date { get; set; } = DateTime.Now;
     }
 
 }

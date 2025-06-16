@@ -10,12 +10,20 @@ const CriarMetaDoacao = () => {
   const [pastorId, setPastorId] = useState<number | null>(null);
   const [churchId, setChurchId] = useState<number | null>(null);
 
+  // Função utilitária para obter data atual no formato do input
+  const getCurrentDateTimeLocal = () => {
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    const localDate = new Date(now.getTime() - offset * 60000);
+    return localDate.toISOString().slice(0, 16);
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     goalsAmount: '',
     amount: '',
-    date: '',
+    date: getCurrentDateTimeLocal(), // <- Já inicializa com a data atual
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});

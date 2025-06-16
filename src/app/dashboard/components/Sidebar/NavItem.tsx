@@ -10,7 +10,7 @@ interface NavItemProps {
   icon: ElementType;
   href?: string;
   children?: { label: string; href: string }[];
-  onNavigate?: () => void; // ✅ ADICIONE ISTO
+  onNavigate?: () => void; 
 }
 
 export function NavItem({ title, icon: Icon, href, children, onNavigate }: NavItemProps) {

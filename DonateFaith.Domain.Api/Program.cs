@@ -16,14 +16,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 AppContext.SetSwitch("Microsoft.EntityFrameworkCore.Issue30204", true);
-// Database
+
 builder.Services.AddDbContext<AppDbContext>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
 });
-// Repositorie
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
@@ -32,7 +32,7 @@ builder.Services.AddScoped<ITitheRepository, TitheRepository>();
 builder.Services.AddScoped<IChurchRepository, ChurchRepository>();
 builder.Services.AddScoped<AuthService>();
 
-// Services
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<IEventService, EventService>();
@@ -40,10 +40,10 @@ builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<ITitheService, TitheService>();
 builder.Services.AddScoped<IChurchService, ChurchService>();
 
-// Token Generator
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-// CORS
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -53,7 +53,7 @@ builder.Services.AddCors(options =>
 });
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
-// JWT Authentication
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -66,20 +66,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = jwtSettings["Issuer"],
             ValidAudience = jwtSettings["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(key),
-            ClockSkew = TimeSpan.Zero, // sem tolerância de atraso
+            ClockSkew = TimeSpan.Zero, 
             NameClaimType = ClaimTypes.NameIdentifier,
             RoleClaimType = ClaimTypes.Role
         };
     });
 
-// Controllers
+
 builder.Services.AddControllers();
 
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-// Swagger + Auth
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {

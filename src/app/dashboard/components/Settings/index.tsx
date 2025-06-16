@@ -92,8 +92,6 @@ export default function SettingsTabs() {
       <div className="w-full max-w-full overflow-hidden">
         <Tabs.List className="flex flex-nowrap overflow-x-auto scroll-smooth no-scrollbar w-full px-5 mt-6 gap-4 border-b border-gray-700/40">
           <TabItem value="tab1" title="Código" isSelected={currentTab === "tab1"} />
-          <TabItem value="tab2" title="Cadastros" isSelected={currentTab === "tab2"} />
-          <TabItem value="tab3" title="Planos" isSelected={currentTab === "tab3"} />
         </Tabs.List>
       </div>
 
@@ -133,13 +131,7 @@ export default function SettingsTabs() {
           </div>
         </Tabs.Content>
 
-        <Tabs.Content value="tab2">
-          <p>Conteúdo da aba Cadastros aqui...</p>
-        </Tabs.Content>
 
-        <Tabs.Content value="tab3">
-          <p>Conteúdo da aba Planos aqui...</p>
-        </Tabs.Content>
 
       </div>
     </Tabs.Root>

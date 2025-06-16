@@ -16,7 +16,7 @@ namespace DonateFaith.Domain.DTOs
         public string Description { get; set; }
         public int UserId { get; set; }
         public int ChurchId { get; set; }
-        public int? ParentDonationId { get; set; } // 👈 Adicionado
+        public int? ParentDonationId { get; set; } 
     }
 
 }

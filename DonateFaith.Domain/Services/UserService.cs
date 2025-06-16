@@ -48,12 +48,12 @@ namespace DonateFaith.Domain.Services
 
         public async Task<UserDTO> RegisterUserAsync(RegisterUserDTO registerUserDto)
         {
-            // CPF já existe?
+            
             var existingUser = await _userRepository.GetByCPFAsync(registerUserDto.CPF);
 
             if (existingUser != null)
             {
-                // Atualiza usuário existente
+                
                 if (!string.IsNullOrEmpty(existingUser.Email))
                     throw new Exception("Usuário já registrado com este CPF.");
 
@@ -61,7 +61,7 @@ namespace DonateFaith.Domain.Services
                 existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerUserDto.Password);
                 existingUser.FullName = registerUserDto.FullName;
                 existingUser.Name = registerUserDto.FullName.Split(' ')[0];
-                existingUser.Role = UserRole.Member; // força member
+                existingUser.Role = UserRole.Member; 
 
                 await _userRepository.UpdateAsync(existingUser);
 
@@ -145,12 +145,12 @@ namespace DonateFaith.Domain.Services
             if (pastor == null || pastor.Role != UserRole.Pastor || pastor.ChurchId == null)
                 throw new Exception("Pastor inválido ou não vinculado a uma igreja.");
 
-            // Verifica se já existe usuário com o mesmo CPF
+            
             var existingUser = await _userRepository.GetByCPFAsync(dto.CPF);
 
             if (existingUser != null)
             {
-                // Atualiza para membro, vincula à igreja do pastor
+                
                 existingUser.Role = UserRole.Member;
                 existingUser.ChurchId = pastor.ChurchId;
                 existingUser.Name = dto.FullName.Split(' ')[0];
@@ -160,7 +160,7 @@ namespace DonateFaith.Domain.Services
             }
             else
             {
-                // Cria novo usuário como membro, só com nome e CPF
+                
                 var newUser = new User
                 {
                     CPF = dto.CPF,

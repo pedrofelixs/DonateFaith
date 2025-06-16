@@ -26,7 +26,7 @@ namespace DonateFaith.Domain.Api.Controllers
             return int.Parse(userIdClaim.Value);
         }
 
-        // ADMIN e PASTOR
+        
         [HttpGet("pastor/{pastorId}")]
         [Authorize(Roles = "Admin,Pastor")]
         public async Task<IActionResult> GetByPastorId(int pastorId)
@@ -34,7 +34,7 @@ namespace DonateFaith.Domain.Api.Controllers
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            // Se não for Admin, só pode consultar se for o próprio pastor
+            
             if (userRole != "Admin" && userId != pastorId)
                 return Forbid();
 
@@ -43,7 +43,7 @@ namespace DonateFaith.Domain.Api.Controllers
             return Ok(church);
         }
 
-        // TODOS PODEM CONSULTAR POR CÓDIGO
+        
         [HttpGet("code/{code}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetChurchByCode(string code)
@@ -55,7 +55,7 @@ namespace DonateFaith.Domain.Api.Controllers
             return Ok(church);
         }
 
-        // SOMENTE PASTOR pode criar igreja
+        
         [HttpPost]
         [Authorize(Roles = "Pastor")]
         public async Task<IActionResult> Create([FromBody] ChurchDTO dto)
@@ -66,23 +66,22 @@ namespace DonateFaith.Domain.Api.Controllers
             return Ok(new { message = "Igreja criada com sucesso.", code });
         }
 
-        // SOMENTE PASTOR pode editar sua própria igreja
+        
         [Authorize(Roles = "Pastor")]
         [HttpPut]
         public async Task<IActionResult> UpdateChurch(ChurchDTO dto)
         {
-            var userId = GetUserIdFromToken(); // retorna ID do usuário do token (2006, por exemplo)
+            var userId = GetUserIdFromToken(); 
 
             var church = await _churchService.GetChurchByPastorIdAsync(userId);
             if (church == null || church.Id != dto.Id)
-                return Forbid(); // previne que um pastor atualize igreja de outro
+                return Forbid(); 
 
             await _churchService.UpdateChurchAsync(dto);
             return Ok();
         }
 
 
-        // SOMENTE PASTOR pode deletar sua igreja
         [HttpDelete("{id}")]
         [Authorize(Roles = "Pastor")]
         public async Task<IActionResult> Delete(int id)
